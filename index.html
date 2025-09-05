@@ -3,395 +3,394 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SJ遊戲</title>
-    <link rel="stylesheet" href="./style.css" />
+    <title>紙娃娃系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .draggable {
+        cursor: move;
+        user-select: none;
+      }
+      .item-slot {
+        transition: all 0.3s ease;
+      }
+      .item-slot:hover {
+        transform: scale(1.05);
+      }
+      .doll-area {
+        background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      .placed-item {
+        position: absolute;
+        cursor: move;
+        border: 2px dashed transparent;
+        transition: border 0.2s;
+      }
+      .placed-item:hover {
+        border-color: #3b82f6;
+      }
+      .resize-handle {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        width: 20px;
+        height: 20px;
+        background: #3b82f6;
+        border-radius: 50%;
+        cursor: nw-resize;
+        display: none;
+      }
+      .placed-item:hover .resize-handle {
+        display: block;
+      }
+    </style>
   </head>
-  <body>
-    <!-- 角色選擇畫面 -->
-    <div class="character-selection" id="characterSelection">
-      <h1 class="selection-title">選擇你的角色</h1>
-      <div class="character-grid">
-        <div class="character-card" onclick="selectCharacter('member3')">
-          <div class="">
-            <img
-              src="./img/yesung.jpeg"
-              alt="yesung"
-              title="yesung"
-              class="img-meber-chose"
-            />
+  <body class="bg-gradient-to-br from-pink-100 to-purple-100 min-h-screen">
+    <div class="container mx-auto p-4 max-w-7xl">
+      <!-- 標題 -->
+      <div class="text-center mb-6">
+        <h1 class="text-4xl font-bold text-purple-800 mb-2">🎎 紙娃娃系統</h1>
+        <p class="text-gray-600">拖拽物件到娃娃身上，點擊調整大小！</p>
+        <div class="mt-2">
+          <span
+            class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+          >
+            已放置: <span id="itemCount">0</span>/10
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 左側物件欄 -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+              👗 服裝物件
+            </h2>
+            <div
+              class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-4"
+              id="itemsContainer"
+            >
+              <!-- 物件會動態生成 -->
+            </div>
           </div>
         </div>
 
-        <div class="character-card" onclick="selectCharacter('member5')">
-          <div class="">
-            <img
-              src="./img/eunhyuk.jpeg"
-              alt="eunhyuk"
-              title="eunhyuk"
-              class="img-meber-chose"
-            />
-          </div>
-        </div>
-        <div class="character-card" onclick="selectCharacter('member6')">
-          <div class="">
-            <img
-              src="./img/hea.jpeg"
-              alt="hea"
-              title="hea"
-              class="img-meber-chose"
-            />
-          </div>
-        </div>
-        <div class="character-card" onclick="selectCharacter('member9')">
-          <div class="">
-            <img
-              src="./img/kyu.jpeg"
-              alt="kyu"
-              title="kyu"
-              class="img-meber-chose"
-            />
+        <!-- 右側娃娃區域 -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h2
+              class="text-2xl font-bold text-gray-800 mb-4 flex items-center justify-between"
+            >
+              🎭 娃娃裝扮區
+              <button
+                onclick="clearAll()"
+                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+              >
+                清除全部
+              </button>
+            </h2>
+            <div
+              class="doll-area rounded-xl h-96 md:h-[500px] relative border-4 border-dashed border-gray-300"
+              id="dollArea"
+            >
+              <!-- 娃娃本體 -->
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-8xl md:text-9xl">🧍‍♀️</div>
+              </div>
+              <!-- 放置的物件會出現在這裡 -->
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 主遊戲畫面 -->
-    <div class="game-container" id="gameContainer">
-      <div class="container">
-        <div class="sidebar">
-          <div class="item-category">
-            <div class="category-title">💎 配件</div>
-            <div
-              class="item five"
-              data-type="accessory"
-              data-item="item5"
-            ></div>
-            <div class="item six" data-type="accessory" data-item="item6"></div>
-            <div class="item n" data-type="accessory" data-item="item9"></div>
+      <!-- 操作說明 -->
+      <div class="mt-6 bg-white rounded-2xl shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-3">📱 操作說明</h3>
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600"
+        >
+          <div class="flex items-center space-x-2">
+            <span class="text-blue-500">👆</span>
+            <span>點擊物件拖拽到娃娃身上</span>
           </div>
-        </div>
-
-        <div class="canvas" id="canvas">
-          <!-- 娃娃基底會在這裡動態生成 -->
-          <div class="doll-base" id="dollBase"></div>
-
-          <div class="controls">
-            <button class="btn back-btn" onclick="backToSelection()">
-              🔙 重選角色
-            </button>
-            <button class="btn" onclick="clearAll()">🗑️ 清除全部</button>
+          <div class="flex items-center space-x-2">
+            <span class="text-green-500">🔍</span>
+            <span>拖拽右下角圓點調整大小</span>
           </div>
-
-          <div class="layer-controls">
-            <button class="btn" onclick="bringToFront()" id="frontBtn">
-              ⬆️ 移到前面
-            </button>
-            <button class="btn" onclick="sendToBack()" id="backBtn">
-              ⬇️ 移到後面
-            </button>
-            <button class="btn" onclick="deleteSelected()" id="deleteBtn">
-              ❌ 刪除
-            </button>
+          <div class="flex items-center space-x-2">
+            <span class="text-red-500">❌</span>
+            <span>雙擊物件可以移除</span>
           </div>
         </div>
       </div>
     </div>
 
     <script>
-      let draggedElement = null;
-      let selectedElement = null;
-      let itemCounter = 0;
-      let currentCharacter = null;
+      // 物件數據
+      const items = [
+        { id: 1, emoji: "👕", name: "上衣", category: "top" },
+        { id: 2, emoji: "👖", name: "褲子", category: "bottom" },
+        { id: 3, emoji: "👗", name: "洋裝", category: "dress" },
+        { id: 4, emoji: "👠", name: "高跟鞋", category: "shoes" },
+        { id: 5, emoji: "👟", name: "運動鞋", category: "shoes" },
+        { id: 6, emoji: "🎩", name: "帽子", category: "hat" },
+        { id: 7, emoji: "👑", name: "皇冠", category: "hat" },
+        { id: 8, emoji: "🕶️", name: "太陽眼鏡", category: "accessory" },
+        { id: 9, emoji: "👜", name: "手提包", category: "accessory" },
+        { id: 10, emoji: "⌚", name: "手錶", category: "accessory" },
+        { id: 11, emoji: "🧣", name: "圍巾", category: "accessory" },
+        { id: 12, emoji: "🧤", name: "手套", category: "accessory" },
+      ];
 
-      // 角色定義
-      const characters = {
-        member3: {
-          name: "yesung",
-          svg: `<img
-              src="./img/yesung.jpeg"
-              alt="yesung"
-              title="yesung"
-              class="img-meber-in"
-            />`,
-        },
-        member5: {
-          name: "eunhyuk",
-          svg: `<img
-              src="./img/eunhyuk.jpeg"
-              alt="eunhyuk"
-              title="eunhyuk"
-              class="img-meber-in"
-            />`,
-        },
-        member6: {
-          name: "hea",
-          svg: `<img
-              src="./img/hea.jpeg"
-              alt="hea"
-              title="hea"
-              class="img-meber-in"
-            />`,
-        },
-        member9: {
-          name: "kyu",
-          svg: `<img
-              src="./img/kyu.jpeg"
-              alt="kyu"
-              title="kyu"
-              class="img-meber-in"
-            />`,
-        },
-      };
+      let placedItems = [];
+      let draggedItem = null;
+      let isDragging = false;
+      let isResizing = false;
+      let currentResizeItem = null;
 
-      // 服裝樣式定義
-      const itemStyles = {
-        // 配件
-        item5: {
-          svg: ` <img src="./img/item/eun.png" alt="" width="80"/>`,
-          width: 40,
-          height: 40,
-        },
-        item6: {
-          svg: ` <img src="./img/item/hea.png" alt="" width="50"/>`,
-          width: 40,
-          height: 40,
-        },
-        item9: {
-          svg: ` <img src="./img/item/kyu.png" alt="" width="50"/>`,
-          width: 40,
-          height: 40,
-        },
-      };
-
-      // 選擇角色
-      function selectCharacter(characterId) {
-        currentCharacter = characterId;
-
-        // 隱藏選擇畫面，顯示遊戲畫面
-        document.getElementById("characterSelection").style.display = "none";
-        document.getElementById("gameContainer").style.display = "block";
-
-        // 載入選中的角色
-        loadCharacter(characterId);
-
-        // 初始化拖拽功能
-        initializeDragAndDrop();
+      // 初始化
+      function init() {
+        renderItems();
+        setupEventListeners();
       }
 
-      // 載入角色
-      function loadCharacter(characterId) {
-        const character = characters[characterId];
-        const dollBase = document.getElementById("dollBase");
-        dollBase.innerHTML = character.svg;
-      }
+      // 渲染物件
+      function renderItems() {
+        const container = document.getElementById("itemsContainer");
+        container.innerHTML = "";
 
-      // 返回角色選擇
-      function backToSelection() {
-        document.getElementById("characterSelection").style.display = "flex";
-        document.getElementById("gameContainer").style.display = "none";
-
-        // 清除所有裝扮
-        clearAll();
-        currentCharacter = null;
-      }
-
-      // 初始化拖拽功能
-      function initializeDragAndDrop() {
-        document.querySelectorAll(".item").forEach((item) => {
-          item.addEventListener("mousedown", startDrag);
+        items.forEach((item) => {
+          const itemElement = document.createElement("div");
+          itemElement.className =
+            "item-slot bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 text-center cursor-pointer border-2 border-transparent hover:border-blue-300 transition-all";
+          itemElement.innerHTML = `
+                    <div class="text-4xl mb-2">${item.emoji}</div>
+                    <div class="text-sm font-medium text-gray-700">${item.name}</div>
+                `;
+          itemElement.addEventListener("click", () => selectItem(item));
+          container.appendChild(itemElement);
         });
       }
 
-      function startDrag(e) {
-        e.preventDefault();
-        const item = e.target;
-        const itemType = item.dataset.item;
+      // 選擇物件
+      function selectItem(item) {
+        if (placedItems.length >= 10) {
+          alert("最多只能放置10個物件！");
+          return;
+        }
 
-        // 創建新的可拖拽元素
-        createDraggableItem(itemType, e.clientX, e.clientY);
+        draggedItem = { ...item, size: 60, x: 50, y: 50 };
+        document.body.style.cursor = "move";
       }
 
-      function createDraggableItem(itemType, x, y) {
-        const canvas = document.getElementById("canvas");
-        const canvasRect = canvas.getBoundingClientRect();
+      // 設置事件監聽器
+      function setupEventListeners() {
+        const dollArea = document.getElementById("dollArea");
 
-        const style = itemStyles[itemType];
-        if (!style) return;
+        // 點擊娃娃區域放置物件
+        dollArea.addEventListener("click", (e) => {
+          if (draggedItem && !isDragging && !isResizing) {
+            const rect = dollArea.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-        const draggable = document.createElement("div");
-        draggable.className = "draggable";
-        draggable.dataset.item = itemType;
-        draggable.id = `item_${++itemCounter}`;
+            draggedItem.x = Math.max(5, Math.min(85, x));
+            draggedItem.y = Math.max(5, Math.min(85, y));
 
-        draggable.innerHTML = `<svg width="${style.width}" height="${style.height}" viewBox="0 0 200 300">${style.svg}</svg>`;
+            placedItems.push({ ...draggedItem, id: Date.now() });
+            draggedItem = null;
+            document.body.style.cursor = "default";
+            renderPlacedItems();
+            updateItemCount();
+          }
+        });
 
-        // 設置初始位置
-        draggable.style.left = x - canvasRect.left - style.width / 2 + "px";
-        draggable.style.top = y - canvasRect.top - style.height / 2 + "px";
+        // 觸摸支援
+        dollArea.addEventListener("touchend", (e) => {
+          if (draggedItem && !isDragging) {
+            e.preventDefault();
+            const rect = dollArea.getBoundingClientRect();
+            const touch = e.changedTouches[0];
+            const x = ((touch.clientX - rect.left) / rect.width) * 100;
+            const y = ((touch.clientY - rect.top) / rect.height) * 100;
 
-        canvas.appendChild(draggable);
+            draggedItem.x = Math.max(5, Math.min(85, x));
+            draggedItem.y = Math.max(5, Math.min(85, y));
 
-        // 添加事件監聽器
-        addDraggableEvents(draggable);
-
-        // 立即開始拖拽
-        selectElement(draggable);
-        startDragging(draggable, x - canvasRect.left, y - canvasRect.top);
+            placedItems.push({ ...draggedItem, id: Date.now() });
+            draggedItem = null;
+            document.body.style.cursor = "default";
+            renderPlacedItems();
+            updateItemCount();
+          }
+        });
       }
 
-      function addDraggableEvents(element) {
-        element.addEventListener("mousedown", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          selectElement(element);
+      // 渲染已放置的物件
+      function renderPlacedItems() {
+        const dollArea = document.getElementById("dollArea");
+        const existingItems = dollArea.querySelectorAll(".placed-item");
+        existingItems.forEach((item) => item.remove());
 
-          const rect = element.getBoundingClientRect();
-          const canvasRect = document
-            .getElementById("canvas")
-            .getBoundingClientRect();
+        placedItems.forEach((item) => {
+          const itemElement = document.createElement("div");
+          itemElement.className = "placed-item";
+          itemElement.style.left = `${item.x}%`;
+          itemElement.style.top = `${item.y}%`;
+          itemElement.style.fontSize = `${item.size}px`;
+          itemElement.innerHTML = `
+                    ${item.emoji}
+                    <div class="resize-handle"></div>
+                `;
 
-          startDragging(
-            element,
-            e.clientX - canvasRect.left,
-            e.clientY - canvasRect.top
+          // 拖拽功能
+          let startX, startY, startLeft, startTop;
+
+          itemElement.addEventListener("mousedown", (e) => {
+            if (e.target.classList.contains("resize-handle")) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = dollArea.getBoundingClientRect();
+            startLeft = (parseFloat(item.x) / 100) * rect.width;
+            startTop = (parseFloat(item.y) / 100) * rect.height;
+          });
+
+          // 觸摸拖拽
+          itemElement.addEventListener("touchstart", (e) => {
+            if (e.target.classList.contains("resize-handle")) return;
+            isDragging = true;
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            const rect = dollArea.getBoundingClientRect();
+            startLeft = (parseFloat(item.x) / 100) * rect.width;
+            startTop = (parseFloat(item.y) / 100) * rect.height;
+          });
+
+          // 雙擊移除
+          itemElement.addEventListener("dblclick", () => {
+            placedItems = placedItems.filter((p) => p.id !== item.id);
+            renderPlacedItems();
+            updateItemCount();
+          });
+
+          // 調整大小
+          const resizeHandle = itemElement.querySelector(".resize-handle");
+          resizeHandle.addEventListener("mousedown", (e) => {
+            e.stopPropagation();
+            isResizing = true;
+            currentResizeItem = item;
+          });
+
+          dollArea.appendChild(itemElement);
+        });
+      }
+
+      // 全域滑鼠移動事件
+      document.addEventListener("mousemove", (e) => {
+        if (isDragging && !isResizing) {
+          const dollArea = document.getElementById("dollArea");
+          const rect = dollArea.getBoundingClientRect();
+          const deltaX = e.clientX - startX;
+          const deltaY = e.clientY - startY;
+
+          const newLeft = startLeft + deltaX;
+          const newTop = startTop + deltaY;
+
+          const newX = Math.max(0, Math.min(90, (newLeft / rect.width) * 100));
+          const newY = Math.max(0, Math.min(90, (newTop / rect.height) * 100));
+
+          // 更新物件位置
+          const movingItem = placedItems.find((item) => {
+            const itemElement = document.elementFromPoint(e.clientX, e.clientY);
+            return itemElement && itemElement.classList.contains("placed-item");
+          });
+
+          if (movingItem) {
+            movingItem.x = newX;
+            movingItem.y = newY;
+            renderPlacedItems();
+          }
+        } else if (isResizing && currentResizeItem) {
+          const newSize = Math.max(
+            20,
+            Math.min(
+              120,
+              currentResizeItem.size + (e.movementX + e.movementY) / 2
+            )
           );
-        });
+          currentResizeItem.size = newSize;
+          renderPlacedItems();
+        }
+      });
 
-        element.addEventListener("dblclick", (e) => {
+      // 觸摸移動事件
+      document.addEventListener("touchmove", (e) => {
+        if (isDragging && !isResizing) {
           e.preventDefault();
-          element.remove();
-          if (selectedElement === element) {
-            selectedElement = null;
-          }
-        });
-      }
+          const dollArea = document.getElementById("dollArea");
+          const rect = dollArea.getBoundingClientRect();
+          const touch = e.touches[0];
+          const deltaX = touch.clientX - startX;
+          const deltaY = touch.clientY - startY;
 
-      function startDragging(element, startX, startY) {
-        draggedElement = element;
-        element.classList.add("dragging");
+          const newLeft = startLeft + deltaX;
+          const newTop = startTop + deltaY;
 
-        const elementRect = element.getBoundingClientRect();
-        const canvasRect = document
-          .getElementById("canvas")
-          .getBoundingClientRect();
+          const newX = Math.max(0, Math.min(90, (newLeft / rect.width) * 100));
+          const newY = Math.max(0, Math.min(90, (newTop / rect.height) * 100));
 
-        const offsetX = startX - (elementRect.left - canvasRect.left);
-        const offsetY = startY - (elementRect.top - canvasRect.top);
-
-        function onMouseMove(e) {
-          if (!draggedElement) return;
-
-          const canvasRect = document
-            .getElementById("canvas")
-            .getBoundingClientRect();
-          const newX = e.clientX - canvasRect.left - offsetX;
-          const newY = e.clientY - canvasRect.top - offsetY;
-
-          draggedElement.style.left = newX + "px";
-          draggedElement.style.top = newY + "px";
-        }
-
-        function onMouseUp() {
-          if (draggedElement) {
-            draggedElement.classList.remove("dragging");
-            draggedElement = null;
-          }
-          document.removeEventListener("mousemove", onMouseMove);
-          document.removeEventListener("mouseup", onMouseUp);
-        }
-
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
-      }
-
-      function selectElement(element) {
-        // 移除之前的選中狀態
-        if (selectedElement) {
-          selectedElement.classList.remove("selected");
-        }
-
-        // 設置新的選中元素
-        selectedElement = element;
-        element.classList.add("selected");
-      }
-
-      // 點擊畫布取消選中
-      document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("canvas").addEventListener("click", (e) => {
-          if (e.target.id === "canvas") {
-            if (selectedElement) {
-              selectedElement.classList.remove("selected");
-              selectedElement = null;
+          // 找到正在移動的物件並更新位置
+          placedItems.forEach((item) => {
+            if (Math.abs(item.x - newX) < 5 && Math.abs(item.y - newY) < 5) {
+              item.x = newX;
+              item.y = newY;
             }
-          }
-        });
+          });
+          renderPlacedItems();
+        }
       });
 
-      // 控制按鈕功能
+      // 停止拖拽
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+        isResizing = false;
+        currentResizeItem = null;
+      });
+
+      document.addEventListener("touchend", () => {
+        isDragging = false;
+        isResizing = false;
+        currentResizeItem = null;
+      });
+
+      // 更新物件計數
+      function updateItemCount() {
+        document.getElementById("itemCount").textContent = placedItems.length;
+      }
+
+      // 清除所有物件
       function clearAll() {
-        const draggables = document.querySelectorAll(".draggable");
-        draggables.forEach((item) => item.remove());
-        selectedElement = null;
-      }
-
-      function bringToFront() {
-        if (selectedElement) {
-          selectedElement.style.zIndex = 1000 + itemCounter++;
+        if (placedItems.length > 0 && confirm("確定要清除所有物件嗎？")) {
+          placedItems = [];
+          renderPlacedItems();
+          updateItemCount();
         }
       }
 
-      function sendToBack() {
-        if (selectedElement) {
-          selectedElement.style.zIndex = 1;
-        }
-      }
-
-      function deleteSelected() {
-        if (selectedElement) {
-          selectedElement.remove();
-          selectedElement = null;
-        }
-      }
-
-      function saveOutfit() {
-        if (currentCharacter) {
-          alert(
-            `${characters[currentCharacter].name}的造型已儲存！🎉 (這是示範功能)`
-          );
-        }
-      }
-
-      // 鍵盤快捷鍵
+      // 取消選擇
       document.addEventListener("keydown", (e) => {
-        if (selectedElement) {
-          switch (e.key) {
-            case "Delete":
-            case "Backspace":
-              deleteSelected();
-              break;
-            case "ArrowUp":
-              e.preventDefault();
-              selectedElement.style.top =
-                parseInt(selectedElement.style.top) - 5 + "px";
-              break;
-            case "ArrowDown":
-              e.preventDefault();
-              selectedElement.style.top =
-                parseInt(selectedElement.style.top) + 5 + "px";
-              break;
-            case "ArrowLeft":
-              e.preventDefault();
-              selectedElement.style.left =
-                parseInt(selectedElement.style.left) - 5 + "px";
-              break;
-            case "ArrowRight":
-              e.preventDefault();
-              selectedElement.style.left =
-                parseInt(selectedElement.style.left) + 5 + "px";
-              break;
-          }
+        if (e.key === "Escape" && draggedItem) {
+          draggedItem = null;
+          document.body.style.cursor = "default";
         }
       });
+
+      // 啟動應用
+      init();
     </script>
     <script>
       (function () {
@@ -400,7 +399,7 @@
           if (b) {
             var d = b.createElement("script");
             d.innerHTML =
-              "window.__CF$cv$params={r:'97a2dab137cdf1dc',t:'MTc1NzA0NTE4OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+              "window.__CF$cv$params={r:'97a3ba1d25a8f1dc',t:'MTc1NzA1NDM0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
             b.getElementsByTagName("head")[0].appendChild(d);
           }
         }
