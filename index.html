@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SJ遊戲</title>
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <!-- 角色選擇畫面 -->
@@ -14,7 +14,7 @@
         <div class="character-card" onclick="selectCharacter('member3')">
           <div class="">
             <img
-              src="/img/yesung.jpeg"
+              src="./img/yesung.jpeg"
               alt="yesung"
               title="yesung"
               class="img-meber-chose"
@@ -25,7 +25,7 @@
         <div class="character-card" onclick="selectCharacter('member5')">
           <div class="">
             <img
-              src="/img/eunhyuk.jpeg"
+              src="./img/eunhyuk.jpeg"
               alt="eunhyuk"
               title="eunhyuk"
               class="img-meber-chose"
@@ -35,7 +35,7 @@
         <div class="character-card" onclick="selectCharacter('member6')">
           <div class="">
             <img
-              src="/img/hea.jpeg"
+              src="./img/hea.jpeg"
               alt="hea"
               title="hea"
               class="img-meber-chose"
@@ -45,7 +45,7 @@
         <div class="character-card" onclick="selectCharacter('member9')">
           <div class="">
             <img
-              src="/img/kyu.jpeg"
+              src="./img/kyu.jpeg"
               alt="kyu"
               title="kyu"
               class="img-meber-chose"
@@ -66,16 +66,8 @@
               data-type="accessory"
               data-item="item5"
             ></div>
-            <div
-              class="item six"
-              data-type="accessory"
-              data-item="item6"
-            ></div>
-            <div
-              class="item n"
-              data-type="accessory"
-              data-item="item9"
-            ></div>
+            <div class="item six" data-type="accessory" data-item="item6"></div>
+            <div class="item n" data-type="accessory" data-item="item9"></div>
           </div>
         </div>
 
@@ -155,17 +147,17 @@
       const itemStyles = {
         // 配件
         item5: {
-          svg: ` <img src="/img/item/eun.png" alt="" width="80"/>`,
+          svg: ` <img src="./img/item/eun.png" alt="" width="80"/>`,
           width: 40,
           height: 40,
         },
         item6: {
-          svg: ` <img src="/img/item/hea.png" alt="" width="50"/>`,
+          svg: ` <img src="./img/item/hea.png" alt="" width="50"/>`,
           width: 40,
           height: 40,
         },
         item9: {
-          svg: ` <img src="/img/item/kyu.png" alt="" width="50"/>`,
+          svg: ` <img src="./img/item/kyu.png" alt="" width="50"/>`,
           width: 40,
           height: 40,
         },

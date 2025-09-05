@@ -121,19 +121,19 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 .item.five {
-  background: url("/img/item/eun.png");
+  background: url("./img/item/eun.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
 }
 .item.six {
-  background: url("/img/item/hea.png");
+  background: url("./img/item/hea.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
 }
 .item.nine {
-  background: url("/img/item/kyu.png");
+  background: url("./img/item/kyu.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
