@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SJ遊戲</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <!-- 角色選擇畫面 -->
+    <div class="character-selection" id="characterSelection">
+      <h1 class="selection-title">選擇你的角色</h1>
+      <div class="character-grid">
+        <div class="character-card" onclick="selectCharacter('member3')">
+          <div class="">
+            <img
+              src="/img/yesung.jpeg"
+              alt="yesung"
+              title="yesung"
+              class="img-meber-chose"
+            />
+          </div>
+        </div>
+
+        <div class="character-card" onclick="selectCharacter('member5')">
+          <div class="">
+            <img
+              src="/img/eunhyuk.jpeg"
+              alt="eunhyuk"
+              title="eunhyuk"
+              class="img-meber-chose"
+            />
+          </div>
+        </div>
+        <div class="character-card" onclick="selectCharacter('member6')">
+          <div class="">
+            <img
+              src="/img/hea.jpeg"
+              alt="hea"
+              title="hea"
+              class="img-meber-chose"
+            />
+          </div>
+        </div>
+        <div class="character-card" onclick="selectCharacter('member9')">
+          <div class="">
+            <img
+              src="/img/kyu.jpeg"
+              alt="kyu"
+              title="kyu"
+              class="img-meber-chose"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主遊戲畫面 -->
+    <div class="game-container" id="gameContainer">
+      <div class="container">
+        <div class="sidebar">
+          <div class="item-category">
+            <div class="category-title">💎 配件</div>
+            <div
+              class="item five"
+              data-type="accessory"
+              data-item="item5"
+            ></div>
+            <div
+              class="item six"
+              data-type="accessory"
+              data-item="item6"
+            ></div>
+            <div
+              class="item n"
+              data-type="accessory"
+              data-item="item9"
+            ></div>
+          </div>
+        </div>
+
+        <div class="canvas" id="canvas">
+          <!-- 娃娃基底會在這裡動態生成 -->
+          <div class="doll-base" id="dollBase"></div>
+
+          <div class="controls">
+            <button class="btn back-btn" onclick="backToSelection()">
+              🔙 重選角色
+            </button>
+            <button class="btn" onclick="clearAll()">🗑️ 清除全部</button>
+          </div>
+
+          <div class="layer-controls">
+            <button class="btn" onclick="bringToFront()" id="frontBtn">
+              ⬆️ 移到前面
+            </button>
+            <button class="btn" onclick="sendToBack()" id="backBtn">
+              ⬇️ 移到後面
+            </button>
+            <button class="btn" onclick="deleteSelected()" id="deleteBtn">
+              ❌ 刪除
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let draggedElement = null;
+      let selectedElement = null;
+      let itemCounter = 0;
+      let currentCharacter = null;
+
+      // 角色定義
+      const characters = {
+        member3: {
+          name: "yesung",
+          svg: `<img
+              src="/img/yesung.jpeg"
+              alt="yesung"
+              title="yesung"
+              class="img-meber-in"
+            />`,
+        },
+        member5: {
+          name: "eunhyuk",
+          svg: `<img
+              src="/img/eunhyuk.jpeg"
+              alt="eunhyuk"
+              title="eunhyuk"
+              class="img-meber-in"
+            />`,
+        },
+        member6: {
+          name: "hea",
+          svg: `<img
+              src="/img/hea.jpeg"
+              alt="hea"
+              title="hea"
+              class="img-meber-in"
+            />`,
+        },
+        member9: {
+          name: "kyu",
+          svg: `<img
+              src="/img/kyu.jpeg"
+              alt="kyu"
+              title="kyu"
+              class="img-meber-in"
+            />`,
+        },
+      };
+
+      // 服裝樣式定義
+      const itemStyles = {
+        // 配件
+        item5: {
+          svg: ` <img src="/img/item/eun.png" alt="" width="80"/>`,
+          width: 40,
+          height: 40,
+        },
+        item6: {
+          svg: ` <img src="/img/item/hea.png" alt="" width="50"/>`,
+          width: 40,
+          height: 40,
+        },
+        item9: {
+          svg: ` <img src="/img/item/kyu.png" alt="" width="50"/>`,
+          width: 40,
+          height: 40,
+        },
+      };
+
+      // 選擇角色
+      function selectCharacter(characterId) {
+        currentCharacter = characterId;
+
+        // 隱藏選擇畫面，顯示遊戲畫面
+        document.getElementById("characterSelection").style.display = "none";
+        document.getElementById("gameContainer").style.display = "block";
+
+        // 載入選中的角色
+        loadCharacter(characterId);
+
+        // 初始化拖拽功能
+        initializeDragAndDrop();
+      }
+
+      // 載入角色
+      function loadCharacter(characterId) {
+        const character = characters[characterId];
+        const dollBase = document.getElementById("dollBase");
+        dollBase.innerHTML = character.svg;
+      }
+
+      // 返回角色選擇
+      function backToSelection() {
+        document.getElementById("characterSelection").style.display = "flex";
+        document.getElementById("gameContainer").style.display = "none";
+
+        // 清除所有裝扮
+        clearAll();
+        currentCharacter = null;
+      }
+
+      // 初始化拖拽功能
+      function initializeDragAndDrop() {
+        document.querySelectorAll(".item").forEach((item) => {
+          item.addEventListener("mousedown", startDrag);
+        });
+      }
+
+      function startDrag(e) {
+        e.preventDefault();
+        const item = e.target;
+        const itemType = item.dataset.item;
+
+        // 創建新的可拖拽元素
+        createDraggableItem(itemType, e.clientX, e.clientY);
+      }
+
+      function createDraggableItem(itemType, x, y) {
+        const canvas = document.getElementById("canvas");
+        const canvasRect = canvas.getBoundingClientRect();
+
+        const style = itemStyles[itemType];
+        if (!style) return;
+
+        const draggable = document.createElement("div");
+        draggable.className = "draggable";
+        draggable.dataset.item = itemType;
+        draggable.id = `item_${++itemCounter}`;
+
+        draggable.innerHTML = `<svg width="${style.width}" height="${style.height}" viewBox="0 0 200 300">${style.svg}</svg>`;
+
+        // 設置初始位置
+        draggable.style.left = x - canvasRect.left - style.width / 2 + "px";
+        draggable.style.top = y - canvasRect.top - style.height / 2 + "px";
+
+        canvas.appendChild(draggable);
+
+        // 添加事件監聽器
+        addDraggableEvents(draggable);
+
+        // 立即開始拖拽
+        selectElement(draggable);
+        startDragging(draggable, x - canvasRect.left, y - canvasRect.top);
+      }
+
+      function addDraggableEvents(element) {
+        element.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          selectElement(element);
+
+          const rect = element.getBoundingClientRect();
+          const canvasRect = document
+            .getElementById("canvas")
+            .getBoundingClientRect();
+
+          startDragging(
+            element,
+            e.clientX - canvasRect.left,
+            e.clientY - canvasRect.top
+          );
+        });
+
+        element.addEventListener("dblclick", (e) => {
+          e.preventDefault();
+          element.remove();
+          if (selectedElement === element) {
+            selectedElement = null;
+          }
+        });
+      }
+
+      function startDragging(element, startX, startY) {
+        draggedElement = element;
+        element.classList.add("dragging");
+
+        const elementRect = element.getBoundingClientRect();
+        const canvasRect = document
+          .getElementById("canvas")
+          .getBoundingClientRect();
+
+        const offsetX = startX - (elementRect.left - canvasRect.left);
+        const offsetY = startY - (elementRect.top - canvasRect.top);
+
+        function onMouseMove(e) {
+          if (!draggedElement) return;
+
+          const canvasRect = document
+            .getElementById("canvas")
+            .getBoundingClientRect();
+          const newX = e.clientX - canvasRect.left - offsetX;
+          const newY = e.clientY - canvasRect.top - offsetY;
+
+          draggedElement.style.left = newX + "px";
+          draggedElement.style.top = newY + "px";
+        }
+
+        function onMouseUp() {
+          if (draggedElement) {
+            draggedElement.classList.remove("dragging");
+            draggedElement = null;
+          }
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onMouseUp);
+        }
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+      }
+
+      function selectElement(element) {
+        // 移除之前的選中狀態
+        if (selectedElement) {
+          selectedElement.classList.remove("selected");
+        }
+
+        // 設置新的選中元素
+        selectedElement = element;
+        element.classList.add("selected");
+      }
+
+      // 點擊畫布取消選中
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("canvas").addEventListener("click", (e) => {
+          if (e.target.id === "canvas") {
+            if (selectedElement) {
+              selectedElement.classList.remove("selected");
+              selectedElement = null;
+            }
+          }
+        });
+      });
+
+      // 控制按鈕功能
+      function clearAll() {
+        const draggables = document.querySelectorAll(".draggable");
+        draggables.forEach((item) => item.remove());
+        selectedElement = null;
+      }
+
+      function bringToFront() {
+        if (selectedElement) {
+          selectedElement.style.zIndex = 1000 + itemCounter++;
+        }
+      }
+
+      function sendToBack() {
+        if (selectedElement) {
+          selectedElement.style.zIndex = 1;
+        }
+      }
+
+      function deleteSelected() {
+        if (selectedElement) {
+          selectedElement.remove();
+          selectedElement = null;
+        }
+      }
+
+      function saveOutfit() {
+        if (currentCharacter) {
+          alert(
+            `${characters[currentCharacter].name}的造型已儲存！🎉 (這是示範功能)`
+          );
+        }
+      }
+
+      // 鍵盤快捷鍵
+      document.addEventListener("keydown", (e) => {
+        if (selectedElement) {
+          switch (e.key) {
+            case "Delete":
+            case "Backspace":
+              deleteSelected();
+              break;
+            case "ArrowUp":
+              e.preventDefault();
+              selectedElement.style.top =
+                parseInt(selectedElement.style.top) - 5 + "px";
+              break;
+            case "ArrowDown":
+              e.preventDefault();
+              selectedElement.style.top =
+                parseInt(selectedElement.style.top) + 5 + "px";
+              break;
+            case "ArrowLeft":
+              e.preventDefault();
+              selectedElement.style.left =
+                parseInt(selectedElement.style.left) - 5 + "px";
+              break;
+            case "ArrowRight":
+              e.preventDefault();
+              selectedElement.style.left =
+                parseInt(selectedElement.style.left) + 5 + "px";
+              break;
+          }
+        }
+      });
+    </script>
+    <script>
+      (function () {
+        function c() {
+          var b = a.contentDocument || a.contentWindow.document;
+          if (b) {
+            var d = b.createElement("script");
+            d.innerHTML =
+              "window.__CF$cv$params={r:'97a2dab137cdf1dc',t:'MTc1NzA0NTE4OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+            b.getElementsByTagName("head")[0].appendChild(d);
+          }
+        }
+        if (document.body) {
+          var a = document.createElement("iframe");
+          a.height = 1;
+          a.width = 1;
+          a.style.position = "absolute";
+          a.style.top = 0;
+          a.style.left = 0;
+          a.style.border = "none";
+          a.style.visibility = "hidden";
+          document.body.appendChild(a);
+          if ("loading" !== document.readyState) c();
+          else if (window.addEventListener)
+            document.addEventListener("DOMContentLoaded", c);
+          else {
+            var e = document.onreadystatechange || function () {};
+            document.onreadystatechange = function (b) {
+              e(b);
+              "loading" !== document.readyState &&
+                ((document.onreadystatechange = e), c());
+            };
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
