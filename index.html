@@ -3,15 +3,193 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>蘇啾</title>
+    <title>紙角色系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="./css.css" />
+    <style>
+      .draggable {
+        cursor: move;
+        user-select: none;
+      }
+      .item-slot {
+        transition: all 0.3s ease;
+      }
+      .item-slot:hover {
+        transform: scale(1.05);
+      }
+      .doll-area {
+        background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+        position: relative;
+        overflow: hidden;
+      }
+      .placed-item {
+        position: absolute;
+        cursor: move;
+        border: 2px dashed transparent;
+        transition: border 0.2s;
+        transform: translate(-50%, -50%);
+        transform-origin: center;
+        z-index: 50;
+      }
+      .placed-item:hover {
+        border-color: #3b82f6;
+      }
+      .placed-item.selected {
+        border-color: #3b82f6;
+      }
+      .resize-handle {
+        position: absolute;
+        bottom: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
+        background: #3b82f6;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: nw-resize;
+        display: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+      }
+      .placed-item.selected .resize-handle {
+        display: block;
+      }
+      .delete-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
+        background: #ef4444;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        color: white;
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
+        font-weight: bold;
+        z-index: 1001;
+      }
+      .placed-item.selected .delete-btn {
+        display: block;
+      }
+      .delete-btn:hover {
+        background: #dc2626;
+      }
+      .layer-controls {
+        position: absolute;
+        top: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        gap: 4px;
+        z-index: 1001;
+      }
+      .rotate-controls {
+        position: absolute;
+        bottom: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        gap: 4px;
+        z-index: 1001;
+      }
+      .placed-item.selected .rotate-controls {
+        display: flex;
+      }
+      .mirror-controls {
+        position: absolute;
+        bottom: -70px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        gap: 4px;
+        z-index: 1001;
+      }
+      .placed-item.selected .mirror-controls {
+        display: flex;
+      }
+      .placed-item.selected .layer-controls {
+        display: flex;
+      }
+      .layer-btn {
+        background: white;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+      }
+      .layer-btn:hover {
+        background: #f3f4f6;
+      }
+      .layer-btn.front {
+        background: #10b981;
+        color: white;
+      }
+      .layer-btn.back {
+        background: #6b7280;
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        .placed-item.selected .resize-handle {
+          width: 30px;
+          height: 30px;
+          bottom: -10px;
+          right: -10px;
+          display: block;
+        }
+        .placed-item.selected .delete-btn {
+          width: 30px;
+          height: 30px;
+          top: -10px;
+          right: -10px;
+          font-size: 16px;
+          line-height: 26px;
+          display: block;
+        }
+        .layer-controls {
+          top: -50px;
+        }
+        .rotate-controls {
+          bottom: -50px;
+        }
+        .mirror-controls {
+          bottom: -80px;
+        }
+        .layer-btn {
+          padding: 6px 10px;
+          font-size: 14px;
+        }
+      }
+
+      .doll-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .doll-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+      .doll-card.selected {
+        border: 3px solid #3b82f6;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      }
+      .w-90 {
+        max-width: 90% !important;
+      }
+    </style>
   </head>
   <body class="bg-gradient-to-br from-pink-100 to-purple-100 min-h-screen">
     <!-- 角色選擇頁面 -->
     <div id="dollSelectionPage" class="container mx-auto p-4 max-w-6xl">
       <div class="text-center mb-8">
-        <p class="text-xl text-gray-600 mb-2">選擇角色！</p>
+        <p class="text-xl text-gray-600 mb-2">選擇你喜歡的角色！</p>
         <p class="text-gray-500">點擊下方任一角色進入裝扮模式</p>
       </div>
 
@@ -24,7 +202,20 @@
             <img
               src="./img/yesung.jpeg"
               alt=""
-              class="object-cover rounded-lg shadow-md"
+              class="object-cover rounded-lg"
+              onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='<Samp></Samp>圖片載入失敗';"
+            />
+          </div>
+        </div>
+        <div
+          class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
+          onclick="selectDoll('idol4', 'shin')"
+        >
+          <div class="mb-4 flex justify-center">
+            <img
+              src="./img/shin.PNG"
+              alt=""
+              class="object-cover rounded-lg"
               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='<Samp></Samp>圖片載入失敗';"
             />
           </div>
@@ -35,9 +226,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/eunhyuk.jpeg"
+              src="./img/eunh.PNG"
               alt=""
-              class="object-cover rounded-lg shadow-md"
+              class="object-cover rounded-lg"
               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗';"
             />
           </div>
@@ -48,9 +239,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/hea.jpeg"
+              src="./img/hea.PNG"
               alt=""
-              class="object-cover rounded-lg shadow-md"
+              class="object-cover rounded-lg"
               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗';"
             />
           </div>
@@ -63,7 +254,7 @@
             <img
               src="./img/kyu.jpeg"
               alt=""
-              class="object-cover rounded-lg shadow-md"
+              class="object-cover rounded-lg"
               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗';"
             />
           </div>
@@ -79,13 +270,6 @@
     >
       <!-- 標題 -->
       <div class="text-center mb-6">
-        <h1 class="text-4xl font-bold text-purple-800 mb-2">目前角色</h1>
-        <p class="text-gray-600">
-          正在裝扮：<span
-            id="selectedDollName"
-            class="font-bold text-purple-600"
-          ></span>
-        </p>
         <div class="mt-2 flex justify-center items-center space-x-4">
           <span
             class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
@@ -106,7 +290,7 @@
         <div class="lg:col-span-1">
           <div class="bg-white rounded-2xl shadow-lg p-6">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-              物件選擇
+              物件
             </h2>
             <div
               class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-4"
@@ -135,13 +319,16 @@
               id="dollArea"
             >
               <!-- 角色本體 -->
-              <div class="absolute inset-0 flex items-center justify-center">
+              <div
+                class="absolute inset-0 flex items-center justify-center pointer-events-none"
+                style="z-index: 10"
+              >
                 <div id="selectedDollImage">
                   <img
-                    src="./img/kyu.jpeg"
-                    alt="idol"
-                    class="w-48 h-64 object-cover rounded-lg shadow-lg"
-                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IFE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MEFRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';"
+                    src=""
+                    alt="角色"
+                    class="w-90 object-cover rounded-lg shadow-lg img-cha"
+                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IFE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MEFRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='女孩角色圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';"
                   />
                 </div>
               </div>
@@ -155,7 +342,7 @@
       <div class="mt-6 bg-white rounded-2xl shadow-lg p-6">
         <h3 class="text-xl font-bold text-gray-800 mb-3">📱 操作說明</h3>
         <div
-          class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600"
+          class="grid grid-cols-1 md:grid-cols-6 gap-4 text-sm text-gray-600"
         >
           <div class="flex items-center space-x-2">
             <span class="text-blue-500">👆</span>
@@ -166,8 +353,20 @@
             <span>拖拽右下角圓點調整大小</span>
           </div>
           <div class="flex items-center space-x-2">
+            <span class="text-purple-500">📚</span>
+            <span>點擊物件調整前後層級</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-orange-500">🔄</span>
+            <span>使用旋轉按鈕調整角度</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-cyan-500">🪞</span>
+            <span>使用鏡像按鈕翻轉物件</span>
+          </div>
+          <div class="flex items-center space-x-2">
             <span class="text-red-500">❌</span>
-            <span>點擊物件顯示刪除按鈕</span>
+            <span>點擊物件顯示控制按鈕</span>
           </div>
         </div>
       </div>
@@ -178,22 +377,66 @@
       const items = [
         {
           id: 1,
-          name: "泡麵",
-          imgUrl: "./img/item/eun.png",
+          name: "西瓜",
+          imgUrl: "./img/item/",
           fallbackSvg:
             "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMjAiIHk9IjMwIiB3aWR0aD0iNjAiIGhlaWdodD0iNTAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iMTAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iNzAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PC9zdmc+",
         },
         {
           id: 2,
-          name: "手機",
-          imgUrl: "./img/item/hea.png",
+          name: "櫻桃",
+          imgUrl: "./img/item/",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMjAiIHk9IjMwIiB3aWR0aD0iNjAiIGhlaWdodD0iNTAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iMTAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iNzAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PC9zdmc+",
+        },
+        {
+          id: 3,
+          name: "檸檬",
+          imgUrl: "./img/eunh.PNG",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMjAiIHk9IjMwIiB3aWR0aD0iNjAiIGhlaWdodD0iNTAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iMTAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iNzAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PC9zdmc+",
+        },
+        {
+          id: 4,
+          name: "藍莓",
+          imgUrl: "./img/item/shin.PNG",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMjAiIHk9IjMwIiB3aWR0aD0iNjAiIGhlaWdodD0iNTAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iMTAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iNzAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PC9zdmc+",
+        },
+        {
+          id: 5,
+          name: "蘋果",
+          imgUrl: "./img/item/eunh.PNG",
           fallbackSvg:
             "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGVsbGlwc2UgY3g9IjUwIiBjeT0iODAiIHJ4PSI0MCIgcnk9IjgiIGZpbGw9IiMzNzM3MzciLz48cmVjdCB4PSIzNSIgeT0iMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjUiIGZpbGw9IiMzNzM3MzciLz48L3N2Zz4=",
         },
         {
-          id: 3,
+          id: 6,
+          name: "草莓",
+          imgUrl: "./img/item/hea.PNG",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGVsbGlwc2UgY3g9IjUwIiBjeT0iODAiIHJ4PSI0MCIgcnk9IjgiIGZpbGw9IiMzNzM3MzciLz48cmVjdCB4PSIzNSIgeT0iMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjUiIGZpbGw9IiMzNzM3MzciLz48L3N2Zz4=",
+        },
+        {
+          id: 7,
 
-          name: "酒杯",
+          name: "鳳梨",
+          imgUrl: "./img/item/kyu.png",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIzNSIgcnk9IjE1IiBmaWxsPSIjZGMxODQ4Ii8+PHJlY3QgeD0iNDUiIHk9IjIwIiB3aWR0aD0iMTAiIGhlaWdodD0iNTAiIGZpbGw9IiNkYzE4NDgiLz48L3N2Zz4=",
+        },
+        {
+          id: 8,
+
+          name: "葡萄",
+          imgUrl: "./img/item/kyu.png",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIzNSIgcnk9IjE1IiBmaWxsPSIjZGMxODQ4Ii8+PHJlY3QgeD0iNDUiIHk9IjIwIiB3aWR0aD0iMTAiIGhlaWdodD0iNTAiIGZpbGw9IiNkYzE4NDgiLz48L3N2Zz4=",
+        },
+        {
+          id: 9,
+
+          name: "橘子",
           imgUrl: "./img/item/kyu.png",
           fallbackSvg:
             "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIzNSIgcnk9IjE1IiBmaWxsPSIjZGMxODQ4Ii8+PHJlY3QgeD0iNDUiIHk9IjIwIiB3aWR0aD0iMTAiIGhlaWdodD0iNTAiIGZpbGw9IiNkYzE4NDgiLz48L3N2Zz4=",
@@ -205,25 +448,30 @@
       let isDragging = false;
       let isResizing = false;
       let currentResizeItem = null;
-      let selectedDoll = { type: "idol9", name: "kyu" };
+      let selectedDoll = { type: "girl", name: "女孩" };
 
       // 角色圖片數據
       const dollImages = {
         idol3: `<img src="./img/yesung.jpeg"
                          alt="yesung"
-                         class=" object-cover rounded-lg shadow-lg"
+                         class="w-90 object-cover rounded-lg"
                          onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IFE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol5: `<img src="./img/eunhyuk.jpeg"
+        idol4: `<img src="./img/shin.PNG"
+                         alt="shin"
+                         class="w-90 object-cover rounded-lg"
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IFE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
+
+        idol5: `<img src="./img/eunh.PNG"
                          alt="eunhyuk"
-                        class="object-cover rounded-lg shadow-lg"
+                        class="w-90 object-cover rounded-lg"
                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjAgUTYwIDUgODUgMjAgUTg1IDI1IDYwIDI1IFEzNSAyNSAzNSAyMCIgZmlsbD0iIzY1NDMyMSIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMzIiIHI9IjMiIGZpbGw9IiMwMDAiLz48Y2lyY2xlIGN4PSI2OCIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PHBhdGggZD0iTTU1IDQwIFE2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI1MCIgcng9IjE1IiBmaWxsPSIjNDE2OWUxIi8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3NSIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzUiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cmVjdCB4PSI0OCIgeT0iMTEwIiB3aWR0aD0iMjQiIGhlaWdodD0iMzUiIHJ4PSIxMiIgZmlsbD0iIzJmNGY0ZiIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzhiNDUxMyIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjOGI0NTEzIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol6: `<img src="./img/hea.jpeg"
+        idol6: `<img src="./img/hea.PNG"
                          alt="hea"
-                        class="object-cover rounded-lg shadow-lg"
+                        class="w-90 object-cover rounded-lg"
                          onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI2MCIgdmlld0JveD0iMCAwIDEyMCAxNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSI0MCIgcj0iMzAiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDE1IDg1IDI1IFE4MCAyMCA2MCAyMCBRNDAgMjAgMzUgMjUiIGZpbGw9IiNkYWE1MjAiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjM3IiByPSI0IiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzNyIgcj0iNCIgZmlsbD0iIzAwMCIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjIiIGZpbGw9IiNmZjY5YjQiLz48ZWxsaXBzZSBjeD0iNjAiIGN5PSI5MCIgcng9IjI1IiByeT0iMzUiIGZpbGw9IiM5OGZiOTgiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjgwIiByPSIxMCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9IjgwIiBjeT0iODAiIHI9IjEwIiBmaWxsPSIjZmRiY2I0Ii8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iMTIwIiByeD0iOCIgcnk9IjE1IiBmaWxsPSIjZmRiY2I0Ii8+PGVsbGlwc2UgY3g9IjcwIiBjeT0iMTIwIiByeD0iOCIgcnk9IjE1IiBmaWxsPSIjZmRiY2I0Ii8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
         idol9: `<img src="./img/kyu.jpeg"
                          alt="kyu"
-                        class="object-cover rounded-lg shadow-lg"
+                        class="w-90 object-cover rounded-lg"
                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjAgUTYwIDEwIDg1IDIwIFE4NSAyNSA2MCAyNSBRMzUgMjUgMzUgMjAiIGZpbGw9IiNkM2QzZDMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjY4IiBjeT0iMzIiIHI9IjgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjYwIiB5MT0iMzIiIHgyPSI2MCIgeTI9IjMyIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMzIiIHI9IjIiIGZpbGw9IiMwMDAiLz48Y2lyY2xlIGN4PSI2OCIgY3k9IjMyIiByPSIyIiBmaWxsPSIjMDAwIi8+PHBhdGggZD0iTTU1IDQyIFE2MCA0NSA2NSA0MiIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0NSIgcng9IjE1IiBmaWxsPSIjODAwMDgwIi8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3NSIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzUiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTA1IFE2MCAxMTUgODAgMTA1IEw4NSAxMzUgUTYwIDE0MCAzNSAxMzUgWiIgZmlsbD0iIzRiMDA4MiIvPjxyZWN0IHg9IjUwIiB5PSIxMzUiIHdpZHRoPSI2IiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzNSIgd2lkdGg9IjYiIGhlaWdodD0iMjAiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
       };
 
@@ -232,7 +480,6 @@
         selectedDoll = { type: dollType, name };
         document.getElementById("selectedDollImage").innerHTML =
           dollImages[dollType];
-        document.getElementById("selectedDollName").textContent = name;
 
         // 切換頁面
         document.getElementById("dollSelectionPage").style.display = "none";
@@ -307,7 +554,7 @@
                     <div class="mb-2 flex justify-center">
                         <img src="${item.imgUrl}" 
                              alt="${item.name}" 
-                             class="w-12 h-12 object-cover rounded-lg shadow-sm"
+                             class="w-12 h-12 object-cover rounded-lg"
                              onerror="this.src='${item.fallbackSvg}'; this.alt='${item.name}圖片載入失敗';">
                     </div>
                     <div class="text-sm font-medium text-gray-700">${item.name}</div>
@@ -324,8 +571,97 @@
           return;
         }
 
-        draggedItem = { ...item, size: 60, x: 50, y: 50 };
+        draggedItem = {
+          ...item,
+          size: 60,
+          x: 50,
+          y: 50,
+          zIndex: 50,
+          rotation: 0,
+          flipX: false,
+          flipY: false,
+        };
         document.body.style.cursor = "move";
+      }
+
+      // 選擇已放置的物件
+      function selectPlacedItem(itemId) {
+        // 清除其他物件的選中狀態
+        document.querySelectorAll(".placed-item").forEach((el) => {
+          el.classList.remove("selected");
+        });
+
+        // 選中當前物件
+        const itemElement = document.querySelector(
+          `[data-item-id="${itemId}"]`
+        );
+        if (itemElement) {
+          itemElement.classList.add("selected");
+        }
+      }
+
+      // 調整物件層級
+      function adjustLayer(itemId, layer) {
+        const item = placedItems.find((p) => p.id === itemId);
+        if (item) {
+          if (layer === "front") {
+            item.zIndex = 200; // 角色前面
+          } else if (layer === "back") {
+            item.zIndex = 5; // 角色後面
+          }
+
+          const itemElement = document.querySelector(
+            `[data-item-id="${itemId}"]`
+          );
+          if (itemElement) {
+            itemElement.style.zIndex = item.zIndex;
+          }
+        }
+      }
+
+      // 旋轉物件
+      function rotateItem(itemId, direction) {
+        const item = placedItems.find((p) => p.id === itemId);
+        if (item) {
+          if (direction === "left") {
+            item.rotation = (item.rotation - 15) % 360;
+          } else if (direction === "right") {
+            item.rotation = (item.rotation + 15) % 360;
+          }
+
+          updateItemTransform(itemId);
+        }
+      }
+
+      // 鏡像翻轉物件
+      function flipItem(itemId, direction) {
+        const item = placedItems.find((p) => p.id === itemId);
+        if (item) {
+          if (direction === "horizontal") {
+            item.flipX = !item.flipX;
+          } else if (direction === "vertical") {
+            item.flipY = !item.flipY;
+          }
+
+          updateItemTransform(itemId);
+        }
+      }
+
+      // 更新物件變換效果
+      function updateItemTransform(itemId) {
+        const item = placedItems.find((p) => p.id === itemId);
+        const itemElement = document.querySelector(
+          `[data-item-id="${itemId}"]`
+        );
+        if (item && itemElement) {
+          const img = itemElement.querySelector("img");
+          if (img) {
+            const scaleX = item.flipX ? -1 : 1;
+            const scaleY = item.flipY ? -1 : 1;
+            const rotation = item.rotation || 0;
+            img.style.transform = `rotate(${rotation}deg) scaleX(${scaleX}) scaleY(${scaleY})`;
+          }
+        }
       }
 
       // 設置事件監聽器
@@ -345,6 +681,9 @@
               id: Date.now(),
               x: Math.max(5, Math.min(85, x)),
               y: Math.max(5, Math.min(85, y)),
+              rotation: 0,
+              flipX: false,
+              flipY: false,
             };
 
             placedItems.push(newItem);
@@ -353,12 +692,10 @@
             renderPlacedItems();
             updateItemCount();
           } else if (!draggedItem && !isDragging && e.target === dollArea) {
-            // 點擊空白處隱藏所有刪除按鈕
-            document
-              .querySelectorAll(".placed-item .delete-btn")
-              .forEach((btn) => {
-                btn.style.display = "none";
-              });
+            // 點擊空白處清除所有選中狀態
+            document.querySelectorAll(".placed-item").forEach((el) => {
+              el.classList.remove("selected");
+            });
           }
         });
 
@@ -376,6 +713,9 @@
               id: Date.now(),
               x: Math.max(5, Math.min(85, x)),
               y: Math.max(5, Math.min(85, y)),
+              rotation: 0,
+              flipX: false,
+              flipY: false,
             };
 
             placedItems.push(newItem);
@@ -383,13 +723,11 @@
             document.body.style.cursor = "default";
             renderPlacedItems();
             updateItemCount();
-          } else if (!draggedItem && !isDragging) {
-            // 點擊空白處隱藏所有刪除按鈕
-            document
-              .querySelectorAll(".placed-item .delete-btn")
-              .forEach((btn) => {
-                btn.style.display = "none";
-              });
+          } else if (!draggedItem && !isDragging && e.target === dollArea) {
+            // 點擊空白處清除所有選中狀態
+            document.querySelectorAll(".placed-item").forEach((el) => {
+              el.classList.remove("selected");
+            });
           }
         });
       }
@@ -405,27 +743,101 @@
           itemElement.className = "placed-item";
           itemElement.style.left = `${item.x}%`;
           itemElement.style.top = `${item.y}%`;
-          itemElement.style.fontSize = `${item.size}px`;
+          itemElement.style.width = `${item.size}px`;
+          itemElement.style.height = `${item.size}px`;
+          itemElement.style.zIndex = item.zIndex || 50;
           itemElement.dataset.itemId = item.id;
           itemElement.innerHTML = `
                     <img src="${item.imgUrl}" 
                          alt="${item.name}" 
-                         class=" object-cover rounded-lg shadow-md pointer-events-none"
-                         style="width: ${item.size}px; height: ${item.size}px;"
-                         onerror="this.src='${item.fallbackSvg}'; this.alt='${item.name}圖片載入失敗';">
+                         class="w-90 h-full object-cover rounded-lg pointer-events-none"
+                         style="transform: rotate(${
+                           item.rotation || 0
+                         }deg) scaleX(${item.flipX ? -1 : 1}) scaleY(${
+            item.flipY ? -1 : 1
+          });"
+                         onerror="this.src='${item.fallbackSvg}'; this.alt='${
+            item.name
+          }圖片載入失敗';">
                     <div class="resize-handle"></div>
                     <div class="delete-btn">×</div>
+                    <div class="layer-controls">
+                        <button class="layer-btn front" onclick="adjustLayer(${
+                          item.id
+                        }, 'front')">前</button>
+                        <button class="layer-btn back" onclick="adjustLayer(${
+                          item.id
+                        }, 'back')">後</button>
+                    </div>
+                    <div class="rotate-controls">
+                        <button class="layer-btn" onclick="rotateItem(${
+                          item.id
+                        }, 'left')">↺</button>
+                        <button class="layer-btn" onclick="rotateItem(${
+                          item.id
+                        }, 'right')">↻</button>
+                    </div>
+                    <div class="mirror-controls">
+                        <button class="layer-btn" onclick="flipItem(${
+                          item.id
+                        }, 'horizontal')">⇄</button>
+                        <button class="layer-btn" onclick="flipItem(${
+                          item.id
+                        }, 'vertical')">⇅</button>
+                    </div>
                 `;
+
+          // 點擊選中物件
+          itemElement.addEventListener("click", (e) => {
+            if (
+              e.target.classList.contains("resize-handle") ||
+              e.target.classList.contains("delete-btn") ||
+              e.target.classList.contains("layer-btn") ||
+              e.target.closest(".rotate-controls") ||
+              e.target.closest(".mirror-controls") ||
+              e.target.closest(".layer-controls")
+            )
+              return;
+
+            e.preventDefault();
+            e.stopPropagation();
+            selectPlacedItem(item.id);
+          });
+
+          // 觸摸選中物件
+          itemElement.addEventListener("touchend", (e) => {
+            if (
+              e.target.classList.contains("resize-handle") ||
+              e.target.classList.contains("delete-btn") ||
+              e.target.classList.contains("layer-btn") ||
+              e.target.closest(".rotate-controls") ||
+              e.target.closest(".mirror-controls") ||
+              e.target.closest(".layer-controls")
+            )
+              return;
+            if (isDragging) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+            selectPlacedItem(item.id);
+          });
 
           // 拖拽功能
           itemElement.addEventListener("mousedown", (e) => {
-            if (e.target.classList.contains("resize-handle")) return;
-            e.preventDefault();
+            if (
+              e.target.classList.contains("resize-handle") ||
+              e.target.classList.contains("delete-btn") ||
+              e.target.classList.contains("layer-btn") ||
+              e.target.closest(".rotate-controls") ||
+              e.target.closest(".mirror-controls") ||
+              e.target.closest(".layer-controls")
+            )
+              return;
 
+            e.preventDefault();
             isDragging = true;
             currentDragItem = item;
 
-            const rect = dollArea.getBoundingClientRect();
             startX = e.clientX;
             startY = e.clientY;
             startItemX = item.x;
@@ -433,17 +845,22 @@
 
             itemElement.style.zIndex = "1000";
             document.body.style.cursor = "move";
+            selectPlacedItem(item.id);
           });
 
           // 觸摸拖拽
           itemElement.addEventListener("touchstart", (e) => {
             if (
               e.target.classList.contains("resize-handle") ||
-              e.target.classList.contains("delete-btn")
+              e.target.classList.contains("delete-btn") ||
+              e.target.classList.contains("layer-btn") ||
+              e.target.closest(".rotate-controls") ||
+              e.target.closest(".mirror-controls") ||
+              e.target.closest(".layer-controls")
             )
               return;
-            e.preventDefault();
 
+            e.preventDefault();
             isDragging = true;
             currentDragItem = item;
 
@@ -454,58 +871,7 @@
             startItemY = item.y;
 
             itemElement.style.zIndex = "1000";
-          });
-
-          // 點擊顯示/隱藏刪除按鈕
-          itemElement.addEventListener("click", (e) => {
-            if (
-              e.target.classList.contains("resize-handle") ||
-              e.target.classList.contains("delete-btn")
-            )
-              return;
-            e.preventDefault();
-            e.stopPropagation();
-
-            // 隱藏其他物件的刪除按鈕
-            document
-              .querySelectorAll(".placed-item .delete-btn")
-              .forEach((btn) => {
-                if (btn.parentElement !== itemElement) {
-                  btn.style.display = "none";
-                }
-              });
-
-            // 切換當前物件的刪除按鈕
-            const deleteBtn = itemElement.querySelector(".delete-btn");
-            deleteBtn.style.display =
-              deleteBtn.style.display === "block" ? "none" : "block";
-          });
-
-          // 觸摸點擊顯示/隱藏刪除按鈕
-          itemElement.addEventListener("touchend", (e) => {
-            if (
-              e.target.classList.contains("resize-handle") ||
-              e.target.classList.contains("delete-btn")
-            )
-              return;
-            if (isDragging) return; // 如果是拖拽操作就不處理點擊
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            // 隱藏其他物件的刪除按鈕
-            document
-              .querySelectorAll(".placed-item .delete-btn")
-              .forEach((btn) => {
-                if (btn.parentElement !== itemElement) {
-                  btn.style.display = "none";
-                }
-              });
-
-            // 切換當前物件的刪除按鈕
-            const deleteBtn = itemElement.querySelector(".delete-btn");
-            deleteBtn.style.display =
-              deleteBtn.style.display === "block" ? "none" : "block";
+            selectPlacedItem(item.id);
           });
 
           // 調整大小
@@ -516,6 +882,7 @@
             isResizing = true;
             currentResizeItem = item;
             document.body.style.cursor = "nw-resize";
+            selectPlacedItem(item.id);
           });
 
           // 觸摸調整大小
@@ -529,6 +896,7 @@
             resizeStartX = touch.clientX;
             resizeStartY = touch.clientY;
             resizeStartSize = item.size;
+            selectPlacedItem(item.id);
           });
 
           // 刪除按鈕功能
@@ -536,18 +904,22 @@
           deleteBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             e.preventDefault();
-            placedItems = placedItems.filter((p) => p.id !== item.id);
-            renderPlacedItems();
-            updateItemCount();
+            if (confirm("確定要刪除這個物件嗎？")) {
+              placedItems = placedItems.filter((p) => p.id !== item.id);
+              renderPlacedItems();
+              updateItemCount();
+            }
           });
 
           // 刪除按鈕觸摸功能
           deleteBtn.addEventListener("touchend", (e) => {
             e.stopPropagation();
             e.preventDefault();
-            placedItems = placedItems.filter((p) => p.id !== item.id);
-            renderPlacedItems();
-            updateItemCount();
+            if (confirm("確定要刪除這個物件嗎？")) {
+              placedItems = placedItems.filter((p) => p.id !== item.id);
+              renderPlacedItems();
+              updateItemCount();
+            }
           });
 
           dollArea.appendChild(itemElement);
@@ -588,7 +960,7 @@
           const newSize = Math.max(
             20,
             Math.min(
-              120,
+              400,
               currentResizeItem.size + (e.movementX + e.movementY) / 2
             )
           );
@@ -597,11 +969,8 @@
             `[data-item-id="${currentResizeItem.id}"]`
           );
           if (itemElement) {
-            const img = itemElement.querySelector("img");
-            if (img) {
-              img.style.width = `${newSize}px`;
-              img.style.height = `${newSize}px`;
-            }
+            itemElement.style.width = `${newSize}px`;
+            itemElement.style.height = `${newSize}px`;
           }
         }
       });
@@ -640,18 +1009,15 @@
           const deltaY = touch.clientY - resizeStartY;
           const delta = (deltaX + deltaY) / 2;
 
-          const newSize = Math.max(20, Math.min(120, resizeStartSize + delta));
+          const newSize = Math.max(20, Math.min(400, resizeStartSize + delta));
           currentResizeItem.size = newSize;
 
           const itemElement = document.querySelector(
             `[data-item-id="${currentResizeItem.id}"]`
           );
           if (itemElement) {
-            const img = itemElement.querySelector("img");
-            if (img) {
-              img.style.width = `${newSize}px`;
-              img.style.height = `${newSize}px`;
-            }
+            itemElement.style.width = `${newSize}px`;
+            itemElement.style.height = `${newSize}px`;
           }
         }
       });
@@ -663,7 +1029,7 @@
             `[data-item-id="${currentDragItem.id}"]`
           );
           if (itemElement) {
-            itemElement.style.zIndex = "";
+            itemElement.style.zIndex = currentDragItem.zIndex || 50;
           }
         }
         isDragging = false;
@@ -679,7 +1045,7 @@
             `[data-item-id="${currentDragItem.id}"]`
           );
           if (itemElement) {
-            itemElement.style.zIndex = "";
+            itemElement.style.zIndex = currentDragItem.zIndex || 50;
           }
         }
         isDragging = false;
@@ -734,7 +1100,7 @@
           if (b) {
             var d = b.createElement("script");
             d.innerHTML =
-              "window.__CF$cv$params={r:'97a430e8e60ef1dc',t:'MTc1NzA1OTIwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+              "window.__CF$cv$params={r:'97a7d27f574af1dc',t:'MTc1NzA5NzI4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
             b.getElementsByTagName("head")[0].appendChild(d);
           }
         }
