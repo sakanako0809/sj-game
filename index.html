@@ -46,6 +46,27 @@
       .placed-item:hover .resize-handle {
         display: block;
       }
+      .delete-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
+        background: #ef4444;
+        border: 2px solid white;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        color: white;
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
+        font-weight: bold;
+      }
+      .delete-btn:hover {
+        background: #dc2626;
+      }
 
       @media (max-width: 768px) {
         .resize-handle {
@@ -55,21 +76,127 @@
           right: -10px;
           display: block !important;
         }
+        .delete-btn {
+          width: 30px;
+          height: 30px;
+          top: -10px;
+          right: -10px;
+          font-size: 16px;
+          line-height: 26px;
+        }
+      }
+
+      .doll-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .doll-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+      .doll-card.selected {
+        border: 3px solid #3b82f6;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
       }
     </style>
   </head>
   <body class="bg-gradient-to-br from-pink-100 to-purple-100 min-h-screen">
-    <div class="container mx-auto p-4 max-w-7xl">
+    <!-- 娃娃選擇頁面 -->
+    <div id="dollSelectionPage" class="container mx-auto p-4 max-w-6xl">
+      <div class="text-center mb-8">
+        <h1 class="text-5xl font-bold text-purple-800 mb-4">🎎 紙娃娃系統</h1>
+        <p class="text-xl text-gray-600 mb-2">選擇你喜歡的娃娃開始裝扮！</p>
+        <p class="text-gray-500">點擊下方任一娃娃進入裝扮模式</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div
+          class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
+          onclick="selectDoll('🧍‍♀️', '女孩')"
+        >
+          <div class="text-8xl mb-4">🧍‍♀️</div>
+          <h3 class="text-lg font-bold text-gray-800">女孩</h3>
+          <p class="text-sm text-gray-600">經典女性娃娃</p>
+        </div>
+
+        <div
+          class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
+          onclick="selectDoll('🧍‍♂️', '男孩')"
+        >
+          <div class="text-8xl mb-4">🧍‍♂️</div>
+          <h3 class="text-lg font-bold text-gray-800">男孩</h3>
+          <p class="text-sm text-gray-600">帥氣男性娃娃</p>
+        </div>
+
+        <div
+          class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
+          onclick="selectDoll('👶', '寶寶')"
+        >
+          <div class="text-8xl mb-4">👶</div>
+          <h3 class="text-lg font-bold text-gray-800">寶寶</h3>
+          <p class="text-sm text-gray-600">可愛小寶寶</p>
+        </div>
+
+        <div
+          class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
+          onclick="selectDoll('👵', '奶奶')"
+        >
+          <div class="text-8xl mb-4">👵</div>
+          <h3 class="text-lg font-bold text-gray-800">奶奶</h3>
+          <p class="text-sm text-gray-600">慈祥的奶奶</p>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <div class="bg-white rounded-2xl shadow-lg p-6 inline-block">
+          <h3 class="text-xl font-bold text-gray-800 mb-3">🎮 遊戲特色</h3>
+          <div
+            class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600"
+          >
+            <div class="flex items-center space-x-2">
+              <span class="text-blue-500">👗</span>
+              <span>豐富的服裝選擇</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-green-500">📱</span>
+              <span>支援手機觸控</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-purple-500">🎨</span>
+              <span>自由拖拽調整</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 遊戲主頁面 -->
+    <div
+      id="gameMainPage"
+      class="container mx-auto p-4 max-w-7xl"
+      style="display: none"
+    >
       <!-- 標題 -->
       <div class="text-center mb-6">
         <h1 class="text-4xl font-bold text-purple-800 mb-2">🎎 紙娃娃系統</h1>
-        <p class="text-gray-600">拖拽物件到娃娃身上，點擊調整大小！</p>
-        <div class="mt-2">
+        <p class="text-gray-600">
+          正在裝扮：<span
+            id="selectedDollName"
+            class="font-bold text-purple-600"
+          ></span>
+        </p>
+        <div class="mt-2 flex justify-center items-center space-x-4">
           <span
             class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
           >
             已放置: <span id="itemCount">0</span>/10
           </span>
+          <button
+            onclick="backToDollSelection()"
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+          >
+            重選娃娃
+          </button>
         </div>
       </div>
 
@@ -109,7 +236,9 @@
             >
               <!-- 娃娃本體 -->
               <div class="absolute inset-0 flex items-center justify-center">
-                <div class="text-8xl md:text-9xl">🧍‍♀️</div>
+                <div class="text-8xl md:text-9xl" id="selectedDollEmoji">
+                  🧍‍♀️
+                </div>
               </div>
               <!-- 放置的物件會出現在這裡 -->
             </div>
@@ -133,7 +262,7 @@
           </div>
           <div class="flex items-center space-x-2">
             <span class="text-red-500">❌</span>
-            <span>雙擊物件可以移除</span>
+            <span>點擊物件顯示刪除按鈕</span>
           </div>
         </div>
       </div>
@@ -152,9 +281,70 @@
       let isDragging = false;
       let isResizing = false;
       let currentResizeItem = null;
+      let selectedDoll = { emoji: "🧍‍♀️", name: "女孩" };
+
+      // 選擇娃娃
+      function selectDoll(emoji, name) {
+        selectedDoll = { emoji, name };
+        document.getElementById("selectedDollEmoji").textContent = emoji;
+        document.getElementById("selectedDollName").textContent = name;
+
+        // 切換頁面
+        document.getElementById("dollSelectionPage").style.display = "none";
+        document.getElementById("gameMainPage").style.display = "block";
+
+        // 重置遊戲狀態
+        placedItems = [];
+        draggedItem = null;
+
+        // 初始化遊戲功能
+        initGame();
+        renderPlacedItems();
+        updateItemCount();
+      }
+
+      // 返回娃娃選擇頁面
+      function backToDollSelection() {
+        if (
+          placedItems.length > 0 &&
+          !confirm("返回選擇頁面將清除所有裝扮，確定要繼續嗎？")
+        ) {
+          return;
+        }
+
+        document.getElementById("gameMainPage").style.display = "none";
+        document.getElementById("dollSelectionPage").style.display = "block";
+
+        // 重置遊戲狀態
+        placedItems = [];
+        draggedItem = null;
+        isDragging = false;
+        isResizing = false;
+        currentResizeItem = null;
+        currentDragItem = null;
+        document.body.style.cursor = "default";
+
+        // 清除娃娃區域的所有物件
+        const dollArea = document.getElementById("dollArea");
+        if (dollArea) {
+          const existingItems = dollArea.querySelectorAll(".placed-item");
+          existingItems.forEach((item) => item.remove());
+        }
+
+        updateItemCount();
+      }
 
       // 初始化
       function init() {
+        // 只在遊戲頁面顯示時才初始化遊戲功能
+        if (document.getElementById("gameMainPage").style.display !== "none") {
+          renderItems();
+          setupEventListeners();
+        }
+      }
+
+      // 初始化遊戲
+      function initGame() {
         renderItems();
         setupEventListeners();
       }
@@ -212,6 +402,13 @@
             document.body.style.cursor = "default";
             renderPlacedItems();
             updateItemCount();
+          } else if (!draggedItem && !isDragging && e.target === dollArea) {
+            // 點擊空白處隱藏所有刪除按鈕
+            document
+              .querySelectorAll(".placed-item .delete-btn")
+              .forEach((btn) => {
+                btn.style.display = "none";
+              });
           }
         });
 
@@ -236,6 +433,13 @@
             document.body.style.cursor = "default";
             renderPlacedItems();
             updateItemCount();
+          } else if (!draggedItem && !isDragging) {
+            // 點擊空白處隱藏所有刪除按鈕
+            document
+              .querySelectorAll(".placed-item .delete-btn")
+              .forEach((btn) => {
+                btn.style.display = "none";
+              });
           }
         });
       }
@@ -256,6 +460,7 @@
           itemElement.innerHTML = `
                     ${item.emoji}
                     <div class="resize-handle"></div>
+                    <div class="delete-btn">×</div>
                 `;
 
           // 拖拽功能
@@ -278,7 +483,11 @@
 
           // 觸摸拖拽
           itemElement.addEventListener("touchstart", (e) => {
-            if (e.target.classList.contains("resize-handle")) return;
+            if (
+              e.target.classList.contains("resize-handle") ||
+              e.target.classList.contains("delete-btn")
+            )
+              return;
             e.preventDefault();
 
             isDragging = true;
@@ -293,12 +502,56 @@
             itemElement.style.zIndex = "1000";
           });
 
-          // 雙擊移除
-          itemElement.addEventListener("dblclick", (e) => {
+          // 點擊顯示/隱藏刪除按鈕
+          itemElement.addEventListener("click", (e) => {
+            if (
+              e.target.classList.contains("resize-handle") ||
+              e.target.classList.contains("delete-btn")
+            )
+              return;
             e.preventDefault();
-            placedItems = placedItems.filter((p) => p.id !== item.id);
-            renderPlacedItems();
-            updateItemCount();
+            e.stopPropagation();
+
+            // 隱藏其他物件的刪除按鈕
+            document
+              .querySelectorAll(".placed-item .delete-btn")
+              .forEach((btn) => {
+                if (btn.parentElement !== itemElement) {
+                  btn.style.display = "none";
+                }
+              });
+
+            // 切換當前物件的刪除按鈕
+            const deleteBtn = itemElement.querySelector(".delete-btn");
+            deleteBtn.style.display =
+              deleteBtn.style.display === "block" ? "none" : "block";
+          });
+
+          // 觸摸點擊顯示/隱藏刪除按鈕
+          itemElement.addEventListener("touchend", (e) => {
+            if (
+              e.target.classList.contains("resize-handle") ||
+              e.target.classList.contains("delete-btn")
+            )
+              return;
+            if (isDragging) return; // 如果是拖拽操作就不處理點擊
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // 隱藏其他物件的刪除按鈕
+            document
+              .querySelectorAll(".placed-item .delete-btn")
+              .forEach((btn) => {
+                if (btn.parentElement !== itemElement) {
+                  btn.style.display = "none";
+                }
+              });
+
+            // 切換當前物件的刪除按鈕
+            const deleteBtn = itemElement.querySelector(".delete-btn");
+            deleteBtn.style.display =
+              deleteBtn.style.display === "block" ? "none" : "block";
           });
 
           // 調整大小
@@ -322,6 +575,25 @@
             resizeStartX = touch.clientX;
             resizeStartY = touch.clientY;
             resizeStartSize = item.size;
+          });
+
+          // 刪除按鈕功能
+          const deleteBtn = itemElement.querySelector(".delete-btn");
+          deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            placedItems = placedItems.filter((p) => p.id !== item.id);
+            renderPlacedItems();
+            updateItemCount();
+          });
+
+          // 刪除按鈕觸摸功能
+          deleteBtn.addEventListener("touchend", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            placedItems = placedItems.filter((p) => p.id !== item.id);
+            renderPlacedItems();
+            updateItemCount();
           });
 
           dollArea.appendChild(itemElement);
@@ -461,8 +733,22 @@
 
       // 清除所有物件
       function clearAll() {
-        if (placedItems.length > 0 && confirm("確定要清除所有物件嗎？")) {
+        if (placedItems.length === 0) {
+          alert("沒有物件可以清除！");
+          return;
+        }
+
+        if (confirm("確定要清除所有物件嗎？")) {
+          // 重置所有狀態
           placedItems = [];
+          draggedItem = null;
+          isDragging = false;
+          isResizing = false;
+          currentResizeItem = null;
+          currentDragItem = null;
+          document.body.style.cursor = "default";
+
+          // 重新渲染（這會清除所有物件）
           renderPlacedItems();
           updateItemCount();
         }
@@ -486,7 +772,7 @@
           if (b) {
             var d = b.createElement("script");
             d.innerHTML =
-              "window.__CF$cv$params={r:'97a3ceb2914df1dc',t:'MTc1NzA1NTE4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+              "window.__CF$cv$params={r:'97a3e523c3a1f1dc',t:'MTc1NzA1NjEwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
             b.getElementsByTagName("head")[0].appendChild(d);
           }
         }
