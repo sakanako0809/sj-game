@@ -3,168 +3,69 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>紙娃娃系統</title>
+    <title>蘇啾</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      .draggable {
-        cursor: move;
-        user-select: none;
-      }
-      .item-slot {
-        transition: all 0.3s ease;
-      }
-      .item-slot:hover {
-        transform: scale(1.05);
-      }
-      .doll-area {
-        background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
-        position: relative;
-        overflow: hidden;
-      }
-      .placed-item {
-        position: absolute;
-        cursor: move;
-        border: 2px dashed transparent;
-        transition: border 0.2s;
-      }
-      .placed-item:hover {
-        border-color: #3b82f6;
-      }
-      .resize-handle {
-        position: absolute;
-        bottom: -8px;
-        right: -8px;
-        width: 24px;
-        height: 24px;
-        background: #3b82f6;
-        border: 2px solid white;
-        border-radius: 50%;
-        cursor: nw-resize;
-        display: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-      .placed-item:hover .resize-handle {
-        display: block;
-      }
-      .delete-btn {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        width: 24px;
-        height: 24px;
-        background: #ef4444;
-        border: 2px solid white;
-        border-radius: 50%;
-        cursor: pointer;
-        display: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        color: white;
-        font-size: 14px;
-        line-height: 20px;
-        text-align: center;
-        font-weight: bold;
-      }
-      .delete-btn:hover {
-        background: #dc2626;
-      }
-
-      @media (max-width: 768px) {
-        .resize-handle {
-          width: 30px;
-          height: 30px;
-          bottom: -10px;
-          right: -10px;
-          display: block !important;
-        }
-        .delete-btn {
-          width: 30px;
-          height: 30px;
-          top: -10px;
-          right: -10px;
-          font-size: 16px;
-          line-height: 26px;
-        }
-      }
-
-      .doll-card {
-        transition: all 0.3s ease;
-        cursor: pointer;
-      }
-      .doll-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      }
-      .doll-card.selected {
-        border: 3px solid #3b82f6;
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-      }
-    </style>
+    <link rel="stylesheet" href="./css.css" />
   </head>
   <body class="bg-gradient-to-br from-pink-100 to-purple-100 min-h-screen">
-    <!-- 娃娃選擇頁面 -->
+    <!-- 角色選擇頁面 -->
     <div id="dollSelectionPage" class="container mx-auto p-4 max-w-6xl">
       <div class="text-center mb-8">
-        <h1 class="text-5xl font-bold text-purple-800 mb-4">🎎 紙娃娃系統</h1>
-        <p class="text-xl text-gray-600 mb-2">選擇你喜歡的娃娃開始裝扮！</p>
-        <p class="text-gray-500">點擊下方任一娃娃進入裝扮模式</p>
+        <p class="text-xl text-gray-600 mb-2">選擇角色！</p>
+        <p class="text-gray-500">點擊下方任一角色進入裝扮模式</p>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
         <div
           class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
-          onclick="selectDoll('🧍‍♀️', '女孩')"
+          onclick="selectDoll('idol3', 'yesung')"
         >
-          <div class="text-8xl mb-4">🧍‍♀️</div>
-          <h3 class="text-lg font-bold text-gray-800">女孩</h3>
-          <p class="text-sm text-gray-600">經典女性娃娃</p>
+          <div class="mb-4 flex justify-center">
+            <img
+              src="./img/yesung.jpeg"
+              alt=""
+              class="object-cover rounded-lg shadow-md"
+              onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='<Samp></Samp>圖片載入失敗';"
+            />
+          </div>
         </div>
-
         <div
           class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
-          onclick="selectDoll('🧍‍♂️', '男孩')"
+          onclick="selectDoll('idol5', 'eunhyuk')"
         >
-          <div class="text-8xl mb-4">🧍‍♂️</div>
-          <h3 class="text-lg font-bold text-gray-800">男孩</h3>
-          <p class="text-sm text-gray-600">帥氣男性娃娃</p>
+          <div class="mb-4 flex justify-center">
+            <img
+              src="./img/eunhyuk.jpeg"
+              alt=""
+              class="object-cover rounded-lg shadow-md"
+              onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗';"
+            />
+          </div>
         </div>
-
         <div
           class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
-          onclick="selectDoll('👶', '寶寶')"
+          onclick="selectDoll('idol6', 'hea')"
         >
-          <div class="text-8xl mb-4">👶</div>
-          <h3 class="text-lg font-bold text-gray-800">寶寶</h3>
-          <p class="text-sm text-gray-600">可愛小寶寶</p>
+          <div class="mb-4 flex justify-center">
+            <img
+              src="./img/hea.jpeg"
+              alt=""
+              class="object-cover rounded-lg shadow-md"
+              onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗';"
+            />
+          </div>
         </div>
-
         <div
           class="doll-card bg-white rounded-2xl shadow-lg p-6 text-center"
-          onclick="selectDoll('👵', '奶奶')"
+          onclick="selectDoll('idol9', 'kyu')"
         >
-          <div class="text-8xl mb-4">👵</div>
-          <h3 class="text-lg font-bold text-gray-800">奶奶</h3>
-          <p class="text-sm text-gray-600">慈祥的奶奶</p>
-        </div>
-      </div>
-
-      <div class="text-center">
-        <div class="bg-white rounded-2xl shadow-lg p-6 inline-block">
-          <h3 class="text-xl font-bold text-gray-800 mb-3">🎮 遊戲特色</h3>
-          <div
-            class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600"
-          >
-            <div class="flex items-center space-x-2">
-              <span class="text-blue-500">👗</span>
-              <span>豐富的服裝選擇</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="text-green-500">📱</span>
-              <span>支援手機觸控</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="text-purple-500">🎨</span>
-              <span>自由拖拽調整</span>
-            </div>
+          <div class="mb-4 flex justify-center">
+            <img
+              src="./img/kyu.jpeg"
+              alt=""
+              class="object-cover rounded-lg shadow-md"
+              onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IEE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗';"
+            />
           </div>
         </div>
       </div>
@@ -178,7 +79,7 @@
     >
       <!-- 標題 -->
       <div class="text-center mb-6">
-        <h1 class="text-4xl font-bold text-purple-800 mb-2">🎎 紙娃娃系統</h1>
+        <h1 class="text-4xl font-bold text-purple-800 mb-2">目前角色</h1>
         <p class="text-gray-600">
           正在裝扮：<span
             id="selectedDollName"
@@ -195,7 +96,7 @@
             onclick="backToDollSelection()"
             class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
           >
-            重選娃娃
+            重選角色
           </button>
         </div>
       </div>
@@ -205,7 +106,7 @@
         <div class="lg:col-span-1">
           <div class="bg-white rounded-2xl shadow-lg p-6">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-              👗 服裝物件
+              物件選擇
             </h2>
             <div
               class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-4"
@@ -216,28 +117,32 @@
           </div>
         </div>
 
-        <!-- 右側娃娃區域 -->
+        <!-- 右側角色區域 -->
         <div class="lg:col-span-2">
           <div class="bg-white rounded-2xl shadow-lg p-6">
             <h2
               class="text-2xl font-bold text-gray-800 mb-4 flex items-center justify-between"
             >
-              🎭 娃娃裝扮區
               <button
                 onclick="clearAll()"
                 class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
               >
-                清除全部
+                清除全部物件
               </button>
             </h2>
             <div
               class="doll-area rounded-xl h-96 md:h-[500px] relative border-4 border-dashed border-gray-300"
               id="dollArea"
             >
-              <!-- 娃娃本體 -->
+              <!-- 角色本體 -->
               <div class="absolute inset-0 flex items-center justify-center">
-                <div class="text-8xl md:text-9xl" id="selectedDollEmoji">
-                  🧍‍♀️
+                <div id="selectedDollImage">
+                  <img
+                    src="./img/kyu.jpeg"
+                    alt="idol"
+                    class="w-48 h-64 object-cover rounded-lg shadow-lg"
+                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IFE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MEFRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';"
+                  />
                 </div>
               </div>
               <!-- 放置的物件會出現在這裡 -->
@@ -254,7 +159,7 @@
         >
           <div class="flex items-center space-x-2">
             <span class="text-blue-500">👆</span>
-            <span>點擊物件拖拽到娃娃身上</span>
+            <span>點擊物件拖拽到角色身上</span>
           </div>
           <div class="flex items-center space-x-2">
             <span class="text-green-500">🔍</span>
@@ -271,9 +176,28 @@
     <script>
       // 物件數據
       const items = [
-        { id: 1, emoji: "👕", name: "上衣" },
-        { id: 2, emoji: "🎩", name: "帽子" },
-        { id: 3, emoji: "👠", name: "鞋子" },
+        {
+          id: 1,
+          name: "泡麵",
+          imgUrl: "./img/item/eun.png",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMjAiIHk9IjMwIiB3aWR0aD0iNjAiIGhlaWdodD0iNTAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iMTAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iNzAiIHk9IjIwIiB3aWR0aD0iMjAiIGhlaWdodD0iMzAiIHJ4PSI1IiBmaWxsPSIjNjM2NmYxIi8+PC9zdmc+",
+        },
+        {
+          id: 2,
+          name: "手機",
+          imgUrl: "./img/item/hea.png",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGVsbGlwc2UgY3g9IjUwIiBjeT0iODAiIHJ4PSI0MCIgcnk9IjgiIGZpbGw9IiMzNzM3MzciLz48cmVjdCB4PSIzNSIgeT0iMjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI2MCIgcng9IjUiIGZpbGw9IiMzNzM3MzciLz48L3N2Zz4=",
+        },
+        {
+          id: 3,
+
+          name: "酒杯",
+          imgUrl: "./img/item/kyu.png",
+          fallbackSvg:
+            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGVsbGlwc2UgY3g9IjUwIiBjeT0iNzAiIHJ4PSIzNSIgcnk9IjE1IiBmaWxsPSIjZGMxODQ4Ii8+PHJlY3QgeD0iNDUiIHk9IjIwIiB3aWR0aD0iMTAiIGhlaWdodD0iNTAiIGZpbGw9IiNkYzE4NDgiLz48L3N2Zz4=",
+        },
       ];
 
       let placedItems = [];
@@ -281,12 +205,33 @@
       let isDragging = false;
       let isResizing = false;
       let currentResizeItem = null;
-      let selectedDoll = { emoji: "🧍‍♀️", name: "女孩" };
+      let selectedDoll = { type: "idol9", name: "kyu" };
 
-      // 選擇娃娃
-      function selectDoll(emoji, name) {
-        selectedDoll = { emoji, name };
-        document.getElementById("selectedDollEmoji").textContent = emoji;
+      // 角色圖片數據
+      const dollImages = {
+        idol3: `<img src="./img/yesung.jpeg"
+                         alt="yesung"
+                         class=" object-cover rounded-lg shadow-lg"
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDEwIDg1IDI1IFE4NSAxNSA2MCAxNSBRMzUgMTUgMzUgMjUiIGZpbGw9IiM4YjQ1MTMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzMiIgcj0iMyIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik01NSA0MCBRNTQ2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0MCIgcng9IjE1IiBmaWxsPSIjZmY2OWI0Ii8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3MCIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzAiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTAwIFE2MCAxMTAgODAgMTAwIEw4NSAxMzAgUTYwIDEzNSAzNSAxMzAgWiIgZmlsbD0iI2ZmMTQ5MyIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
+        idol5: `<img src="./img/eunhyuk.jpeg"
+                         alt="eunhyuk"
+                        class="object-cover rounded-lg shadow-lg"
+                        onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjAgUTYwIDUgODUgMjAgUTg1IDI1IDYwIDI1IFEzNSAyNSAzNSAyMCIgZmlsbD0iIzY1NDMyMSIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMzIiIHI9IjMiIGZpbGw9IiMwMDAiLz48Y2lyY2xlIGN4PSI2OCIgY3k9IjMyIiByPSIzIiBmaWxsPSIjMDAwIi8+PHBhdGggZD0iTTU1IDQwIFE2MCA0MyA2NSA0MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI1MCIgcng9IjE1IiBmaWxsPSIjNDE2OWUxIi8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3NSIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzUiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cmVjdCB4PSI0OCIgeT0iMTEwIiB3aWR0aD0iMjQiIGhlaWdodD0iMzUiIHJ4PSIxMiIgZmlsbD0iIzJmNGY0ZiIvPjxyZWN0IHg9IjUwIiB5PSIxMzAiIHdpZHRoPSI2IiBoZWlnaHQ9IjI1IiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzMCIgd2lkdGg9IjYiIGhlaWdodD0iMjUiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzhiNDUxMyIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjOGI0NTEzIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
+        idol6: `<img src="./img/hea.jpeg"
+                         alt="hea"
+                        class="object-cover rounded-lg shadow-lg"
+                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI2MCIgdmlld0JveD0iMCAwIDEyMCAxNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSI0MCIgcj0iMzAiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjUgUTYwIDE1IDg1IDI1IFE4MCAyMCA2MCAyMCBRNDAgMjAgMzUgMjUiIGZpbGw9IiNkYWE1MjAiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjM3IiByPSI0IiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNjgiIGN5PSIzNyIgcj0iNCIgZmlsbD0iIzAwMCIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNDUiIHI9IjIiIGZpbGw9IiNmZjY5YjQiLz48ZWxsaXBzZSBjeD0iNjAiIGN5PSI5MCIgcng9IjI1IiByeT0iMzUiIGZpbGw9IiM5OGZiOTgiLz48Y2lyY2xlIGN4PSI0MCIgY3k9IjgwIiByPSIxMCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9IjgwIiBjeT0iODAiIHI9IjEwIiBmaWxsPSIjZmRiY2I0Ii8+PGVsbGlwc2UgY3g9IjUwIiBjeT0iMTIwIiByeD0iOCIgcnk9IjE1IiBmaWxsPSIjZmRiY2I0Ii8+PGVsbGlwc2UgY3g9IjcwIiBjeT0iMTIwIiByeD0iOCIgcnk9IjE1IiBmaWxsPSIjZmRiY2I0Ii8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
+        idol9: `<img src="./img/kyu.jpeg"
+                         alt="kyu"
+                        class="object-cover rounded-lg shadow-lg"
+                            onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDEyMCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSIzNSIgcj0iMjUiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNMzUgMjAgUTYwIDEwIDg1IDIwIFE4NSAyNSA2MCAyNSBRMzUgMjUgMzUgMjAiIGZpbGw9IiNkM2QzZDMiLz48Y2lyY2xlIGN4PSI1MiIgY3k9IjMyIiByPSI4IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjY4IiBjeT0iMzIiIHI9IjgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjYwIiB5MT0iMzIiIHgyPSI2MCIgeTI9IjMyIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgY3g9IjUyIiBjeT0iMzIiIHI9IjIiIGZpbGw9IiMwMDAiLz48Y2lyY2xlIGN4PSI2OCIgY3k9IjMyIiByPSIyIiBmaWxsPSIjMDAwIi8+PHBhdGggZD0iTTU1IDQyIFE2MCA0NSA2NSA0MiIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSI0NSIgeT0iNjAiIHdpZHRoPSIzMCIgaGVpZ2h0PSI0NSIgcng9IjE1IiBmaWxsPSIjODAwMDgwIi8+PGNpcmNsZSBjeD0iMzUiIGN5PSI3NSIgcj0iOCIgZmlsbD0iI2ZkYmNiNCIvPjxjaXJjbGUgY3g9Ijg1IiBjeT0iNzUiIHI9IjgiIGZpbGw9IiNmZGJjYjQiLz48cGF0aCBkPSJNNDAgMTA1IFE2MCAxMTUgODAgMTA1IEw4NSAxMzUgUTYwIDE0MCAzNSAxMzUgWiIgZmlsbD0iIzRiMDA4MiIvPjxyZWN0IHg9IjUwIiB5PSIxMzUiIHdpZHRoPSI2IiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmRiY2I0Ii8+PHJlY3QgeD0iNjQiIHk9IjEzNSIgd2lkdGg9IjYiIGhlaWdodD0iMjAiIGZpbGw9IiNmZGJjYjQiLz48ZWxsaXBzZSBjeD0iNTMiIGN5PSIxNTciIHJ4PSI4IiByeT0iMyIgZmlsbD0iIzAwMCIvPjxlbGxpcHNlIGN4PSI2NyIgY3k9IjE1NyIgcng9IjgiIHJ5PSIzIiBmaWxsPSIjMDAwIi8+PC9zdmc+'; this.alt='圖片載入失敗'; this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
+      };
+
+      // 選擇角色
+      function selectDoll(dollType, name) {
+        selectedDoll = { type: dollType, name };
+        document.getElementById("selectedDollImage").innerHTML =
+          dollImages[dollType];
         document.getElementById("selectedDollName").textContent = name;
 
         // 切換頁面
@@ -303,7 +248,7 @@
         updateItemCount();
       }
 
-      // 返回娃娃選擇頁面
+      // 返回角色選擇頁面
       function backToDollSelection() {
         if (
           placedItems.length > 0 &&
@@ -324,7 +269,7 @@
         currentDragItem = null;
         document.body.style.cursor = "default";
 
-        // 清除娃娃區域的所有物件
+        // 清除角色區域的所有物件
         const dollArea = document.getElementById("dollArea");
         if (dollArea) {
           const existingItems = dollArea.querySelectorAll(".placed-item");
@@ -359,7 +304,12 @@
           itemElement.className =
             "item-slot bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 text-center cursor-pointer border-2 border-transparent hover:border-blue-300 transition-all";
           itemElement.innerHTML = `
-                    <div class="text-4xl mb-2">${item.emoji}</div>
+                    <div class="mb-2 flex justify-center">
+                        <img src="${item.imgUrl}" 
+                             alt="${item.name}" 
+                             class="w-12 h-12 object-cover rounded-lg shadow-sm"
+                             onerror="this.src='${item.fallbackSvg}'; this.alt='${item.name}圖片載入失敗';">
+                    </div>
                     <div class="text-sm font-medium text-gray-700">${item.name}</div>
                 `;
           itemElement.addEventListener("click", () => selectItem(item));
@@ -382,7 +332,7 @@
       function setupEventListeners() {
         const dollArea = document.getElementById("dollArea");
 
-        // 點擊娃娃區域放置物件
+        // 點擊角色區域放置物件
         dollArea.addEventListener("click", (e) => {
           if (draggedItem && !isDragging && !isResizing) {
             e.preventDefault();
@@ -458,7 +408,11 @@
           itemElement.style.fontSize = `${item.size}px`;
           itemElement.dataset.itemId = item.id;
           itemElement.innerHTML = `
-                    ${item.emoji}
+                    <img src="${item.imgUrl}" 
+                         alt="${item.name}" 
+                         class=" object-cover rounded-lg shadow-md pointer-events-none"
+                         style="width: ${item.size}px; height: ${item.size}px;"
+                         onerror="this.src='${item.fallbackSvg}'; this.alt='${item.name}圖片載入失敗';">
                     <div class="resize-handle"></div>
                     <div class="delete-btn">×</div>
                 `;
@@ -643,7 +597,11 @@
             `[data-item-id="${currentResizeItem.id}"]`
           );
           if (itemElement) {
-            itemElement.style.fontSize = `${newSize}px`;
+            const img = itemElement.querySelector("img");
+            if (img) {
+              img.style.width = `${newSize}px`;
+              img.style.height = `${newSize}px`;
+            }
           }
         }
       });
@@ -689,7 +647,11 @@
             `[data-item-id="${currentResizeItem.id}"]`
           );
           if (itemElement) {
-            itemElement.style.fontSize = `${newSize}px`;
+            const img = itemElement.querySelector("img");
+            if (img) {
+              img.style.width = `${newSize}px`;
+              img.style.height = `${newSize}px`;
+            }
           }
         }
       });
@@ -772,7 +734,7 @@
           if (b) {
             var d = b.createElement("script");
             d.innerHTML =
-              "window.__CF$cv$params={r:'97a3e523c3a1f1dc',t:'MTc1NzA1NjEwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+              "window.__CF$cv$params={r:'97a430e8e60ef1dc',t:'MTc1NzA1OTIwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
             b.getElementsByTagName("head")[0].appendChild(d);
           }
         }
