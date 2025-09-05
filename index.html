@@ -32,17 +32,29 @@
       }
       .resize-handle {
         position: absolute;
-        bottom: -5px;
-        right: -5px;
-        width: 20px;
-        height: 20px;
+        bottom: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
         background: #3b82f6;
+        border: 2px solid white;
         border-radius: 50%;
         cursor: nw-resize;
         display: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
       .placed-item:hover .resize-handle {
         display: block;
+      }
+
+      @media (max-width: 768px) {
+        .resize-handle {
+          width: 30px;
+          height: 30px;
+          bottom: -10px;
+          right: -10px;
+          display: block !important;
+        }
       }
     </style>
   </head>
@@ -130,18 +142,9 @@
     <script>
       // 物件數據
       const items = [
-        { id: 1, emoji: "👕", name: "上衣", category: "top" },
-        { id: 2, emoji: "👖", name: "褲子", category: "bottom" },
-        { id: 3, emoji: "👗", name: "洋裝", category: "dress" },
-        { id: 4, emoji: "👠", name: "高跟鞋", category: "shoes" },
-        { id: 5, emoji: "👟", name: "運動鞋", category: "shoes" },
-        { id: 6, emoji: "🎩", name: "帽子", category: "hat" },
-        { id: 7, emoji: "👑", name: "皇冠", category: "hat" },
-        { id: 8, emoji: "🕶️", name: "太陽眼鏡", category: "accessory" },
-        { id: 9, emoji: "👜", name: "手提包", category: "accessory" },
-        { id: 10, emoji: "⌚", name: "手錶", category: "accessory" },
-        { id: 11, emoji: "🧣", name: "圍巾", category: "accessory" },
-        { id: 12, emoji: "🧤", name: "手套", category: "accessory" },
+        { id: 1, emoji: "👕", name: "上衣" },
+        { id: 2, emoji: "🎩", name: "帽子" },
+        { id: 3, emoji: "👠", name: "鞋子" },
       ];
 
       let placedItems = [];
@@ -192,14 +195,19 @@
         // 點擊娃娃區域放置物件
         dollArea.addEventListener("click", (e) => {
           if (draggedItem && !isDragging && !isResizing) {
+            e.preventDefault();
             const rect = dollArea.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-            draggedItem.x = Math.max(5, Math.min(85, x));
-            draggedItem.y = Math.max(5, Math.min(85, y));
+            const newItem = {
+              ...draggedItem,
+              id: Date.now(),
+              x: Math.max(5, Math.min(85, x)),
+              y: Math.max(5, Math.min(85, y)),
+            };
 
-            placedItems.push({ ...draggedItem, id: Date.now() });
+            placedItems.push(newItem);
             draggedItem = null;
             document.body.style.cursor = "default";
             renderPlacedItems();
@@ -216,10 +224,14 @@
             const x = ((touch.clientX - rect.left) / rect.width) * 100;
             const y = ((touch.clientY - rect.top) / rect.height) * 100;
 
-            draggedItem.x = Math.max(5, Math.min(85, x));
-            draggedItem.y = Math.max(5, Math.min(85, y));
+            const newItem = {
+              ...draggedItem,
+              id: Date.now(),
+              x: Math.max(5, Math.min(85, x)),
+              y: Math.max(5, Math.min(85, y)),
+            };
 
-            placedItems.push({ ...draggedItem, id: Date.now() });
+            placedItems.push(newItem);
             draggedItem = null;
             document.body.style.cursor = "default";
             renderPlacedItems();
@@ -234,44 +246,56 @@
         const existingItems = dollArea.querySelectorAll(".placed-item");
         existingItems.forEach((item) => item.remove());
 
-        placedItems.forEach((item) => {
+        placedItems.forEach((item, index) => {
           const itemElement = document.createElement("div");
           itemElement.className = "placed-item";
           itemElement.style.left = `${item.x}%`;
           itemElement.style.top = `${item.y}%`;
           itemElement.style.fontSize = `${item.size}px`;
+          itemElement.dataset.itemId = item.id;
           itemElement.innerHTML = `
                     ${item.emoji}
                     <div class="resize-handle"></div>
                 `;
 
           // 拖拽功能
-          let startX, startY, startLeft, startTop;
-
           itemElement.addEventListener("mousedown", (e) => {
             if (e.target.classList.contains("resize-handle")) return;
+            e.preventDefault();
+
             isDragging = true;
+            currentDragItem = item;
+
+            const rect = dollArea.getBoundingClientRect();
             startX = e.clientX;
             startY = e.clientY;
-            const rect = dollArea.getBoundingClientRect();
-            startLeft = (parseFloat(item.x) / 100) * rect.width;
-            startTop = (parseFloat(item.y) / 100) * rect.height;
+            startItemX = item.x;
+            startItemY = item.y;
+
+            itemElement.style.zIndex = "1000";
+            document.body.style.cursor = "move";
           });
 
           // 觸摸拖拽
           itemElement.addEventListener("touchstart", (e) => {
             if (e.target.classList.contains("resize-handle")) return;
+            e.preventDefault();
+
             isDragging = true;
+            currentDragItem = item;
+
             const touch = e.touches[0];
             startX = touch.clientX;
             startY = touch.clientY;
-            const rect = dollArea.getBoundingClientRect();
-            startLeft = (parseFloat(item.x) / 100) * rect.width;
-            startTop = (parseFloat(item.y) / 100) * rect.height;
+            startItemX = item.x;
+            startItemY = item.y;
+
+            itemElement.style.zIndex = "1000";
           });
 
           // 雙擊移除
-          itemElement.addEventListener("dblclick", () => {
+          itemElement.addEventListener("dblclick", (e) => {
+            e.preventDefault();
             placedItems = placedItems.filter((p) => p.id !== item.id);
             renderPlacedItems();
             updateItemCount();
@@ -281,38 +305,58 @@
           const resizeHandle = itemElement.querySelector(".resize-handle");
           resizeHandle.addEventListener("mousedown", (e) => {
             e.stopPropagation();
+            e.preventDefault();
             isResizing = true;
             currentResizeItem = item;
+            document.body.style.cursor = "nw-resize";
+          });
+
+          // 觸摸調整大小
+          resizeHandle.addEventListener("touchstart", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            isResizing = true;
+            currentResizeItem = item;
+
+            const touch = e.touches[0];
+            resizeStartX = touch.clientX;
+            resizeStartY = touch.clientY;
+            resizeStartSize = item.size;
           });
 
           dollArea.appendChild(itemElement);
         });
       }
 
+      // 全域變數用於拖拽
+      let currentDragItem = null;
+      let startX, startY, startItemX, startItemY;
+      let resizeStartX, resizeStartY, resizeStartSize;
+
       // 全域滑鼠移動事件
       document.addEventListener("mousemove", (e) => {
-        if (isDragging && !isResizing) {
+        if (isDragging && !isResizing && currentDragItem) {
           const dollArea = document.getElementById("dollArea");
           const rect = dollArea.getBoundingClientRect();
           const deltaX = e.clientX - startX;
           const deltaY = e.clientY - startY;
 
-          const newLeft = startLeft + deltaX;
-          const newTop = startTop + deltaY;
+          const deltaXPercent = (deltaX / rect.width) * 100;
+          const deltaYPercent = (deltaY / rect.height) * 100;
 
-          const newX = Math.max(0, Math.min(90, (newLeft / rect.width) * 100));
-          const newY = Math.max(0, Math.min(90, (newTop / rect.height) * 100));
+          const newX = Math.max(0, Math.min(90, startItemX + deltaXPercent));
+          const newY = Math.max(0, Math.min(90, startItemY + deltaYPercent));
 
-          // 更新物件位置
-          const movingItem = placedItems.find((item) => {
-            const itemElement = document.elementFromPoint(e.clientX, e.clientY);
-            return itemElement && itemElement.classList.contains("placed-item");
-          });
+          currentDragItem.x = newX;
+          currentDragItem.y = newY;
 
-          if (movingItem) {
-            movingItem.x = newX;
-            movingItem.y = newY;
-            renderPlacedItems();
+          // 即時更新位置
+          const itemElement = document.querySelector(
+            `[data-item-id="${currentDragItem.id}"]`
+          );
+          if (itemElement) {
+            itemElement.style.left = `${newX}%`;
+            itemElement.style.top = `${newY}%`;
           }
         } else if (isResizing && currentResizeItem) {
           const newSize = Math.max(
@@ -323,13 +367,18 @@
             )
           );
           currentResizeItem.size = newSize;
-          renderPlacedItems();
+          const itemElement = document.querySelector(
+            `[data-item-id="${currentResizeItem.id}"]`
+          );
+          if (itemElement) {
+            itemElement.style.fontSize = `${newSize}px`;
+          }
         }
       });
 
       // 觸摸移動事件
       document.addEventListener("touchmove", (e) => {
-        if (isDragging && !isResizing) {
+        if (isDragging && !isResizing && currentDragItem) {
           e.preventDefault();
           const dollArea = document.getElementById("dollArea");
           const rect = dollArea.getBoundingClientRect();
@@ -337,33 +386,71 @@
           const deltaX = touch.clientX - startX;
           const deltaY = touch.clientY - startY;
 
-          const newLeft = startLeft + deltaX;
-          const newTop = startTop + deltaY;
+          const deltaXPercent = (deltaX / rect.width) * 100;
+          const deltaYPercent = (deltaY / rect.height) * 100;
 
-          const newX = Math.max(0, Math.min(90, (newLeft / rect.width) * 100));
-          const newY = Math.max(0, Math.min(90, (newTop / rect.height) * 100));
+          const newX = Math.max(0, Math.min(90, startItemX + deltaXPercent));
+          const newY = Math.max(0, Math.min(90, startItemY + deltaYPercent));
 
-          // 找到正在移動的物件並更新位置
-          placedItems.forEach((item) => {
-            if (Math.abs(item.x - newX) < 5 && Math.abs(item.y - newY) < 5) {
-              item.x = newX;
-              item.y = newY;
-            }
-          });
-          renderPlacedItems();
+          currentDragItem.x = newX;
+          currentDragItem.y = newY;
+
+          // 即時更新位置
+          const itemElement = document.querySelector(
+            `[data-item-id="${currentDragItem.id}"]`
+          );
+          if (itemElement) {
+            itemElement.style.left = `${newX}%`;
+            itemElement.style.top = `${newY}%`;
+          }
+        } else if (isResizing && currentResizeItem) {
+          e.preventDefault();
+          const touch = e.touches[0];
+          const deltaX = touch.clientX - resizeStartX;
+          const deltaY = touch.clientY - resizeStartY;
+          const delta = (deltaX + deltaY) / 2;
+
+          const newSize = Math.max(20, Math.min(120, resizeStartSize + delta));
+          currentResizeItem.size = newSize;
+
+          const itemElement = document.querySelector(
+            `[data-item-id="${currentResizeItem.id}"]`
+          );
+          if (itemElement) {
+            itemElement.style.fontSize = `${newSize}px`;
+          }
         }
       });
 
       // 停止拖拽
       document.addEventListener("mouseup", () => {
+        if (currentDragItem) {
+          const itemElement = document.querySelector(
+            `[data-item-id="${currentDragItem.id}"]`
+          );
+          if (itemElement) {
+            itemElement.style.zIndex = "";
+          }
+        }
         isDragging = false;
         isResizing = false;
+        currentDragItem = null;
         currentResizeItem = null;
+        document.body.style.cursor = "default";
       });
 
       document.addEventListener("touchend", () => {
+        if (currentDragItem) {
+          const itemElement = document.querySelector(
+            `[data-item-id="${currentDragItem.id}"]`
+          );
+          if (itemElement) {
+            itemElement.style.zIndex = "";
+          }
+        }
         isDragging = false;
         isResizing = false;
+        currentDragItem = null;
         currentResizeItem = null;
       });
 
@@ -399,7 +486,7 @@
           if (b) {
             var d = b.createElement("script");
             d.innerHTML =
-              "window.__CF$cv$params={r:'97a3ba1d25a8f1dc',t:'MTc1NzA1NDM0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+              "window.__CF$cv$params={r:'97a3ceb2914df1dc',t:'MTc1NzA1NTE4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
             b.getElementsByTagName("head")[0].appendChild(d);
           }
         }
