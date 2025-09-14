@@ -744,8 +744,6 @@
 
         draggedItem = {
           ...item,
-          sizeW: 100,
-          sizeh: 60,
           size: 100,
           x: 50,
           y: 50,
@@ -916,8 +914,8 @@
           itemElement.className = "placed-item";
           itemElement.style.left = `${item.x}%`;
           itemElement.style.top = `${item.y}%`;
-          itemElement.style.width = `${item.sizeW}px`;
-          itemElement.style.height = `${item.sizeH}px`;
+          itemElement.style.width = `${item.size}px`;
+          itemElement.style.height = `auto`;
           itemElement.style.zIndex = item.zIndex || 50;
           itemElement.dataset.itemId = item.id;
           itemElement.innerHTML = `
@@ -1190,7 +1188,7 @@
           );
           if (itemElement) {
             itemElement.style.width = `${newSize}px`;
-            itemElement.style.height = `${newSize}px`;
+            itemElement.style.height = `auto`;
           }
         }
       });
