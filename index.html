@@ -17,7 +17,7 @@
         transform: scale(1.05);
       }
       .doll-area {
-        background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+        background: linear-gradient(135deg, #ffffff 0%, #e3e3e3 100%);
         position: relative;
         overflow: hidden;
       }
@@ -183,6 +183,10 @@
       .w-90 {
         max-width: 90% !important;
       }
+      .idol-size-pos {
+        width: 50%;
+        max-width: 300px;
+      }
     </style>
   </head>
   <body class="bg-gradient-to-br from-pink-100 to-purple-100 min-h-screen">
@@ -193,16 +197,16 @@
         <p class="text-gray-500">點擊下方任一角色進入裝扮模式</p>
       </div>
 
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
         <div
           class="doll-card bg-white rounded-2xl shadow-lg text-center"
           onclick="selectDoll('idol1', 'Leeteuk')"
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/Leeteuk.PNG"
+              src="./img/lt.webp"
               alt=""
-              class="object-cover rounded-lg"
+              class="p-5 object-cover rounded-lg"
             />
           </div>
         </div>
@@ -212,9 +216,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/Heechul.PNG"
+              src="./img/hc.webp"
               alt=""
-              class="object-cover rounded-lg"
+              class="p-5 object-cover rounded-lg"
             />
           </div>
         </div>
@@ -224,9 +228,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/Yesung.PNG"
+              src="./img/ys.webp"
               alt=""
-              class="object-cover rounded-lg"
+              class="p-5 object-cover rounded-lg"
             />
           </div>
         </div>
@@ -236,9 +240,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/Shindong.PNG"
+              src="./img/sd.webp"
               alt=""
-              class="object-cover rounded-lg"
+              class="p-5 object-cover rounded-lg"
             />
           </div>
         </div>
@@ -248,9 +252,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/Eunhyuk.PNG"
+              src="./img/eh.webp"
               alt=""
-              class="object-cover rounded-lg"
+              class="p-5 object-cover rounded-lg"
             />
           </div>
         </div>
@@ -260,9 +264,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/Donghae.PNG"
+              src="./img/dh.webp"
               alt=""
-              class="object-cover rounded-lg"
+              class="p-5 object-cover rounded-lg"
             />
           </div>
         </div>
@@ -271,7 +275,11 @@
           onclick="selectDoll('idol7', 'Siwon')"
         >
           <div class="mb-4 flex justify-center">
-            <img src="./img/Siwon.PNG" alt="" class="object-cover rounded-lg" />
+            <img
+              src="./img/sw.webp"
+              alt=""
+              class="p-5 object-cover rounded-lg"
+            />
           </div>
         </div>
         <div
@@ -280,9 +288,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/Ryeowook.PNG"
+              src="./img/rw.webp"
               alt=""
-              class="object-cover rounded-lg"
+              class="p-5 object-cover rounded-lg"
             />
           </div>
         </div>
@@ -292,9 +300,9 @@
         >
           <div class="mb-4 flex justify-center">
             <img
-              src="./img/Kyuhyun.PNG"
+              src="./img/kh.webp"
               alt=""
-              class="object-cover rounded-lg"
+              class="p-5 object-cover rounded-lg"
             />
           </div>
         </div>
@@ -332,7 +340,7 @@
               配件
             </h2>
             <div
-              class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"
+              class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4"
               id="itemsFruit"
             >
               <!-- 物件會動態生成 -->
@@ -359,8 +367,8 @@
             >
               <!-- 角色本體 -->
               <div
-                class="absolute inset-0 flex items-center justify-center pointer-events-none"
-                style="z-index: 10"
+                class="idol-size-pos absolute inset-0 flex items-center justify-center pointer-events-none"
+                style="z-index: 10; left: 25%"
               >
                 <div id="selectedDollImage">
                   <img
@@ -417,92 +425,176 @@
         {
           id: 1,
           name: "西瓜?",
-          imgUrl: "./img/item/water.PNG",
+          imgUrl: "./img/item/fruit_lt.webp",
         },
         {
           id: 2,
           name: "櫻桃",
-          imgUrl: "./img/item/cherry.PNG",
+          imgUrl: "./img/item/fruit_hc.webp",
         },
         {
           id: 3,
           name: "檸檬",
-          imgUrl: "./img/item/lemon.PNG",
+          imgUrl: "./img/item/fruit_ys.webp",
         },
         {
           id: 4,
           name: "藍莓",
-          imgUrl: "./img/item/blueberry.PNG",
+          imgUrl: "./img/item/fruit_sd.webp",
         },
         {
           id: 5,
           name: "蘋果",
-          imgUrl: "./img/item/apple.PNG",
+          imgUrl: "./img/item/fruit_eh.webp",
         },
         {
           id: 6,
           name: "草莓",
-          imgUrl: "./img/item/strawberry.PNG",
+          imgUrl: "./img/item/fruit_dh.webp",
         },
         {
           id: 7,
           name: "鳳梨",
-          imgUrl: "./img/item/pinapple.PNG",
+          imgUrl: "./img/item/fruit_sw.webp",
         },
         {
           id: 8,
           name: "葡萄",
-          imgUrl: "./img/item/grape.PNG",
+          imgUrl: "./img/item/fruit_rw.webp",
         },
         {
           id: 9,
           name: "橘子",
-          imgUrl: "./img/item/orange.PNG",
+          imgUrl: "./img/item/fruit_kh.webp",
         },
         {
           id: 10,
           name: "鴨",
-          imgUrl: "./img/Leeteuk.PNG",
+          imgUrl: "./img/lt.webp",
         },
         {
           id: 11,
           name: "孔雀",
-          imgUrl: "./img/Heechul.PNG",
+          imgUrl: "./img/hc.webp",
         },
         {
           id: 12,
           name: "貓",
-          imgUrl: "./img/Yesung.PNG",
+          imgUrl: "./img/ys.webp",
         },
         {
           id: 13,
           name: "熊貓",
-          imgUrl: "./img/Shindong.PNG",
+          imgUrl: "./img/sd.webp",
         },
         {
           id: 14,
           name: "兔子",
-          imgUrl: "./img/Eunhyuk.PNG",
+          imgUrl: "./img/eh.webp",
         },
         {
           id: 15,
           name: "狗狗",
-          imgUrl: "./img/Donghae.PNG",
+          imgUrl: "./img/dh.webp",
         },
         {
           id: 16,
           name: "馬",
-          imgUrl: "./img/Siwon.PNG",
+          imgUrl: "./img/sw.webp",
         },
         {
           id: 17,
           name: "長頸鹿",
-          imgUrl: "./img/Ryeowook.PNG",
+          imgUrl: "./img/rw.webp",
         },
         {
           id: 18,
           name: "企鵝",
-          imgUrl: "./img/Kyuhyun.PNG",
+          imgUrl: "./img/kh.webp",
+        },
+        {
+          name: "表情lt",
+          imgUrl: "./img/item/face_lt.webp",
+        },
+        {
+          name: "表情hc",
+          imgUrl: "./img/item/face_hc.webp",
+        },
+        {
+          name: "表情ys",
+          imgUrl: "./img/item/face_ys.webp",
+        },
+        {
+          name: "表情sd",
+          imgUrl: "./img/item/face_sd.webp",
+        },
+        {
+          name: "表情eh",
+          imgUrl: "./img/item/face_eh.webp",
+        },
+        {
+          name: "表情dh",
+          imgUrl: "./img/item/face_dh.webp",
+        },
+        {
+          name: "表情sw",
+          imgUrl: "./img/item/face_sw.webp",
+        },
+        {
+          name: "表情rw",
+          imgUrl: "./img/item/face_rw.webp",
+        },
+        {
+          name: "表情kh",
+          imgUrl: "./img/item/face_kh.webp",
+        },
+        {
+          name: "bible",
+          imgUrl: "./img/item/bible.webp",
+        },
+        {
+          name: "bottle",
+          imgUrl: "./img/item/bottle.webp",
+        },
+        {
+          name: "chips_1",
+          imgUrl: "./img/item/chips_1.webp",
+        },
+        {
+          name: "chips_2",
+          imgUrl: "./img/item/chips_2.webp",
+        },
+        {
+          name: "clear",
+          imgUrl: "./img/item/clear.webp",
+        },
+        {
+          name: "coffee",
+          imgUrl: "./img/item/coffee.webp",
+        },
+        {
+          name: "game",
+          imgUrl: "./img/item/game.webp",
+        },
+        {
+          name: "sjlightstick_2",
+          imgUrl: "./img/item/sjlightstick_2.webp",
+        },
+        {
+          name: "lightstick_sp",
+          imgUrl: "./img/item/lightstick_sp.webp",
+        },
+        {
+          name: "newspaper",
+          imgUrl: "./img/item/newspaper.webp",
+        },
+        {
+          name: "noodle",
+          imgUrl: "./img/item/noodle.webp",
+        },
+        {
+          name: "redwine",
+          imgUrl: "./img/item/redwine.webp",
         },
       ];
 
@@ -515,39 +607,39 @@
 
       // 角色圖片數據
       const dollImages = {
-        idol1: `<img src="./img/Leeteuk.PNG"
+        idol1: `<img src="./img/lt.webp"
                          alt="Leeteuk"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol2: `<img src="./img/Heechul.PNG"
+        idol2: `<img src="./img/hc.webp"
                          alt="Heechul"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol3: `<img src="./img/Yesung.PNG"
+        idol3: `<img src="./img/ys.webp"
                          alt="Yesung"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol4: `<img src="./img/Shindong.PNG"
+        idol4: `<img src="./img/sd.webp"
                          alt="Shindong"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol5: `<img src="./img/Eunhyuk.PNG"
+        idol5: `<img src="./img/eh.webp"
                          alt="Eunhyuk"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol6: `<img src="./img/Donghae.PNG"
+        idol6: `<img src="./img/dh.webp"
                          alt="Donghae"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol7: `<img src="./img/Siwon.PNG"
+        idol7: `<img src="./img/sw.webp"
                          alt="Siwon"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol8: `<img src="./img/Ryeowook.PNG"
+        idol8: `<img src="./img/rw.webp"
                          alt="Ryeowook"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
-        idol9: `<img src="./img/Kyuhyun.PNG"
+        idol9: `<img src="./img/kh.webp"
                          alt="Kyuhyun"
                          class="w-90 object-cover rounded-lg"
                          this.className='w-48 h-64 object-cover rounded-lg shadow-lg';">`,
@@ -632,7 +724,7 @@
                     <div class="mb-2 flex justify-center">
                         <img src="${item.imgUrl}" 
                              alt="${item.name}" 
-                             class="w-12 h-12 object-cover rounded-lg"
+                             class="h-12 object-cover rounded-lg"
                              onerror="this.src='${item.fallbackSvg}'; this.alt='${item.name}圖片載入失敗';">
                     </div>
                    
@@ -652,10 +744,12 @@
 
         draggedItem = {
           ...item,
-          size: 60,
+          sizeW: 100,
+          sizeh: 60,
+          size: 100,
           x: 50,
           y: 50,
-          zIndex: 50,
+          zIndex: 15,
           rotation: 0,
           flipX: false,
           flipY: false,
@@ -684,9 +778,9 @@
         const item = placedItems.find((p) => p.id === itemId);
         if (item) {
           if (layer === "front") {
-            item.zIndex = 200; // 角色前面
+            item.zIndex = item.zIndex + 10; // 角色前面
           } else if (layer === "back") {
-            item.zIndex = 5; // 角色後面
+            item.zIndex = item.zIndex - 10; // 角色後面
           }
 
           const itemElement = document.querySelector(
@@ -822,8 +916,8 @@
           itemElement.className = "placed-item";
           itemElement.style.left = `${item.x}%`;
           itemElement.style.top = `${item.y}%`;
-          itemElement.style.width = `${item.size}px`;
-          itemElement.style.height = `${item.size}px`;
+          itemElement.style.width = `${item.sizeW}px`;
+          itemElement.style.height = `${item.sizeH}px`;
           itemElement.style.zIndex = item.zIndex || 50;
           itemElement.dataset.itemId = item.id;
           itemElement.innerHTML = `
@@ -1049,7 +1143,7 @@
           );
           if (itemElement) {
             itemElement.style.width = `${newSize}px`;
-            itemElement.style.height = `${newSize}px`;
+            itemElement.style.height = `auto`;
           }
         }
       });
