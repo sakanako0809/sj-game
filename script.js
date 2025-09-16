@@ -4,51 +4,51 @@ let selected = null;
 
 const components = {
   "角色": [
-    "img/char_lt.webp",
-    "img/char_hc.webp",
-    "img/char_ys.webp",
-    "img/char_sd.webp",
-    "img/char_eh.webp",
-    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/dh.webp",
-    "img/char_sw.webp",
-    "img/char_rw.webp",
-    "img/char_kh.webp"
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_lt.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_hc.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_ys.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_sd.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_eh.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_dh.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_sw.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_rw.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/char_kh.webp"
   ],
   "水果": [
-    "img/fruit_lt.webp",
-    "img/fruit_hc.webp",
-    "img/fruit_ys.webp",
-    "img/fruit_sd.webp",
-    "img/fruit_eh.webp",
-    "img/fruit_dh.webp",
-    "img/fruit_sw.webp",
-    "img/fruit_rw.webp",
-    "img/fruit_kh.webp"
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_lt.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_hc.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_ys.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_sd.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_eh.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_dh.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_sw.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_rw.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/fruit_kh.webp"
   ],
   "小物件": [
-    "img/item_sjlightstick_2.webp",
-    "img/item_redwine.webp",
-    "img/item_noodle.webp",
-    "img/item_newspaper.webp",
-    "img/item_lightstick_sp.webp",
-    "img/item_game.webp",
-    "img/item_coffee.webp",
-    "img/item_clear.webp",
-    "img/item_chips_2.webp",
-    "img/item_chips_1.webp",
-    "img/item_bottle.webp",
-    "img/item_bible.webp"
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_sjlightstick_2.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_redwine.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_noodle.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_newspaper.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_lightstick_sp.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_game.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_coffee.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_clear.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_chips_2.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_chips_1.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_bottle.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/item_bible.webp"
   ],
   "表情": [
-    "img/face_lt.webp",
-    "img/face_hc.webp",
-    "img/face_ys.webp",
-    "img/face_sd.webp",
-    "img/face_eh.webp",
-    "img/face_dh.webp",
-    "img/face_sw.webp",
-    "img/face_rw.webp",
-    "img/face_kh.webp"
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_lt.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_hc.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_ys.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_sd.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_eh.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_dh.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_sw.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_rw.webp",
+    "https://raw.githubusercontent.com/sakanako0809/sj-game/refs/heads/main/img/face_kh.webp"
   ]
 };
 
