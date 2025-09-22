@@ -53,6 +53,11 @@ const components = {
   ]
 };
 
+//判斷是否為觸控裝置
+function isMobile() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 // 點分類 → 載入元件列表
 document.querySelectorAll('.category').forEach(cat => {
   cat.addEventListener('click', () => {
@@ -66,13 +71,68 @@ function loadComponentList(type) {
   components[type].forEach(url => {
     const img = document.createElement('img');
     img.src = url;
-    img.draggable = true;
-    img.addEventListener('dragstart', e => {
-      e.dataTransfer.setData("text/plain", url);
-    });
+
+    if (isMobile()) {
+      // 👉 手機版：點擊新增
+      img.addEventListener('click', () => {
+        const rect = canvas.getBoundingClientRect();
+        const x = rect.width / 2;
+        const y = rect.height / 2;
+        addComponent(url, x, y);
+      });
+    } else {
+      // 👉 電腦版：拖曳新增
+      img.draggable = true;
+      img.addEventListener('dragstart', e => {
+        e.dataTransfer.setData("text/plain", url);
+      });
+    }
+
     componentList.appendChild(img);
   });
 }
+
+function addComponent(url, x, y) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "item";
+  wrapper.style.position = "absolute";
+  wrapper.style.left = x + "px";
+  wrapper.style.top = y + "px";
+  wrapper.style.width = "100px";
+  wrapper.style.zIndex = zIndexCounter++;
+  wrapper.dataset.angle = 0;
+  wrapper.dataset.scaleX = 1;
+  wrapper.setAttribute("data-x", 0);
+  wrapper.setAttribute("data-y", 0);
+
+  const rotateWrapper = document.createElement("div");
+  rotateWrapper.className = "rotate-wrapper";
+  rotateWrapper.style.width = "100%";
+  rotateWrapper.style.height = "100%";
+
+  const img = document.createElement("img");
+  img.src = url;
+  img.style.width = "100%";
+  img.draggable = false;
+
+  rotateWrapper.appendChild(img);
+  wrapper.appendChild(rotateWrapper);
+
+  const rotateHandle = document.createElement("div");
+  rotateHandle.className = "rotate-handle";
+  rotateHandle.style.display = "none";
+
+  wrapper.appendChild(rotateHandle);
+  canvas.appendChild(wrapper);
+
+  makeInteractive(wrapper);
+  selectElement(wrapper);
+
+  wrapper.addEventListener("pointerdown", () => {
+    selectElement(wrapper);
+  });
+}
+
 
 // 頁面一載入就預設載入「角色」
 window.addEventListener("DOMContentLoaded", () => {
@@ -98,7 +158,9 @@ canvas.addEventListener("drop", e => {
   e.preventDefault();
   const url = e.dataTransfer.getData("text/plain");
   if (!url) return;
+  addComponent(url, e.offsetX, e.offsetY);
 
+/*
   const wrapper = document.createElement("div");
   wrapper.className = "item";
   wrapper.style.position = "absolute";
@@ -111,24 +173,36 @@ canvas.addEventListener("drop", e => {
   wrapper.setAttribute("data-x", 0);
   wrapper.setAttribute("data-y", 0);
 
+  // 新增 rotate-wrapper，用來包住圖片，控制 transform
+  const rotateWrapper = document.createElement("div");
+  rotateWrapper.className = "rotate-wrapper";
+  rotateWrapper.style.width = "100%";
+  rotateWrapper.style.height = "100%";
+
   const img = document.createElement("img");
   img.src = url;
   img.style.width = "100%";
   img.draggable = false;
 
+  rotateWrapper.appendChild(img); // 把圖片加到 rotate-wrapper 中
+  wrapper.appendChild(rotateWrapper); // 再加到 item 外層中
+
+  // ✅ 把 rotate-handle 放在 item 外層，與圖片分開
   const rotateHandle = document.createElement("div");
   rotateHandle.className = "rotate-handle";
+  rotateHandle.style.display = "none"; // 預設隱藏
 
-  wrapper.appendChild(img);
   wrapper.appendChild(rotateHandle);
   canvas.appendChild(wrapper);
 
   makeInteractive(wrapper);
   selectElement(wrapper);
 
+  // 確保點擊時可以選取
   wrapper.addEventListener("pointerdown", () => {
     selectElement(wrapper);
   });
+  */
 });
 
 // 設定選取
@@ -140,7 +214,7 @@ function selectElement(el) {
   }
 
   selected = el;
-  selected.style.outline = '2px dashed red';
+  selected.style.outline = '2px dashed #AAA';
 
   const handle = selected.querySelector('.rotate-handle');
   if (handle) handle.style.display = 'block';
@@ -190,9 +264,30 @@ function makeInteractive(el) {
       ],
       listeners: {
         move(event) {
+          const target = event.target;
+
+          // 原始資料
+          const x = parseFloat(target.getAttribute('data-x')) || 0;
+          const y = parseFloat(target.getAttribute('data-y')) || 0;
+
+          // 新尺寸
           const { width, height } = event.rect;
-          el.style.width = width + "px";
-          el.style.height = height + "px";
+          target.style.width = width + "px";
+          target.style.height = height + "px";
+
+          // 取得縮放偏移量
+          const dx = event.deltaRect.left;
+          const dy = event.deltaRect.top;
+
+          // 更新位置（往左上補償）
+          const newX = x + dx;
+          const newY = y + dy;
+
+          target.setAttribute('data-x', newX);
+          target.setAttribute('data-y', newY);
+
+          // 更新 transform
+          applyTransform(target);
         }
       }
     });
@@ -267,14 +362,6 @@ function sendBackward() {
   }
 }
 
-function rotate() {
-  if (!selected) return;
-  let angle = parseFloat(selected.dataset.angle || "0");
-  angle += 15;
-  selected.dataset.angle = angle;
-  applyTransform(selected);
-}
-
 function flip() {
   if (!selected) return;
   selected.dataset.scaleX = selected.dataset.scaleX == 1 ? -1 : 1;
@@ -296,3 +383,43 @@ function remove() {
   selected.remove();
   selected = null;
 }
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  // 清除所有元件
+  document.querySelectorAll("#canvas .item").forEach(el => el.remove());
+  selected = null;
+});
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+  if (confirm("確定要清空整個畫布嗎？這個操作無法還原。")) {
+    document.querySelectorAll("#canvas .item").forEach(el => el.remove());
+    selected = null;
+  }
+});
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+  const canvasArea = document.getElementById("canvas");
+
+  // 暫時隱藏所有 rotate handle
+  canvasArea.querySelectorAll(".rotate-handle").forEach(handle => {
+    handle.style.display = "none";
+  });
+
+  html2canvas(canvasArea, {
+    backgroundColor: null,  // 保留透明背景（若需要）
+    useCORS: true  // 跨網域圖片支援
+  }).then(canvas => {
+    // 下載圖片
+    const link = document.createElement("a");
+    link.download = "my-canvas.png";
+    link.href = canvas.toDataURL();
+    link.click();
+
+    // 恢復 rotate handle 顯示（如果有選中）
+    if (selected) {
+      const handle = selected.querySelector(".rotate-handle");
+      if (handle) handle.style.display = "block";
+    }
+  });
+});
+

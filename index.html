@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>拼貼互動網頁</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -21,8 +23,10 @@
         <button onclick="bringForward()">上移</button>
         <button onclick="sendBackward()">下移</button>
         <button onclick="flip()">鏡射</button>
-        <button onclick="rotate()">旋轉</button>
         <button onclick="remove()">刪除</button>
+        <button id="clearBtn">清空畫布</button>
+
+        <button id="saveBtn">另存為圖片</button>
       </div>
       <div class="canvas" id="canvas"></div>
     </main>
